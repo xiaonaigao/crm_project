@@ -433,6 +433,9 @@ public class User {
                 ", createBy='" + createBy + '\'' +
                 ", editTime='" + editTime + '\'' +
                 ", editBy='" + editBy + '\'' +
+                ", editBy='" + editBy + '\'' +
+                ", editBy='" + editBy + '\'' +
+                ", editBy='" + editBy + '\'' +
                 '}';
     }
 }
