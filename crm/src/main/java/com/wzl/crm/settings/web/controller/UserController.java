@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,7 +42,7 @@ public class UserController {
 	 */
 	@RequestMapping("settings/qx/user/login.do")
 	public @ResponseBody
-	Object login(String loginAct, String loginPwd, String isRemPwd, HttpServletRequest request) {
+	Object login(String loginAct, String loginPwd, String isRemPwd, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
 		//封装参数
 		Map<String, Object> map = new HashMap<>();
 		map.put("loginAct", loginAct);
@@ -64,8 +66,34 @@ public class UserController {
 			returnObject.setMessage("ip受限");
 		} else {//登录成功
 			returnObject.setCode(Contants.RETURN_OBJECT_CODE_SUCCESS);
-			HttpSession session = request.getSession();
-			session.setAttribute("username",user.getName());
+			// 把user存放到session
+			session.setAttribute(Contants.SESSION_USER, user);
+
+			//记住密码
+			if ("true".equals(isRemPwd)) {
+				Cookie c1 = new Cookie("loginAct", user.getLoginAct());//账号
+				//设置生命周期
+				c1.setMaxAge(10 * 24 * 60 * 60);
+				//保存到浏览器
+				response.addCookie(c1);
+				Cookie c2 = new Cookie("loginPwd", user.getLoginPwd());//密码
+				//设置生命周期
+				c2.setMaxAge(10 * 24 * 60 * 60);
+				//保存到浏览器
+				response.addCookie(c2);
+			}else {
+				//删除之前cookie
+				Cookie c1 = new Cookie("loginAct","1");//账号
+				//设置生命周期
+				c1.setMaxAge(0);
+				//保存到浏览器
+				response.addCookie(c1);
+				Cookie c2 = new Cookie("loginPwd", "1");//密码
+				//设置生命周期
+				c2.setMaxAge(0);
+				//保存到浏览器
+				response.addCookie(c2);
+			}
 		}
 		return returnObject;
 	}
