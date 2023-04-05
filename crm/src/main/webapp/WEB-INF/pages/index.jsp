@@ -5,6 +5,7 @@
 </head>
 <body>
 	<script type="text/javascript">
+		<%--点击主页跳转到登录--%>
 		window.location.href = "settings/qx/user/toLogin.do";
 	</script>
 </body>

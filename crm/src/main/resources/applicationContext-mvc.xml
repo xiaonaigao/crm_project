@@ -39,3 +39,5 @@ http://www.springframework.org/schema/util/spring-util.xsd">
         <property name="defaultEncoding" value="utf-8"/>
     </bean>-->
 </beans>
+
+<!--SpringMVC配置文件-->

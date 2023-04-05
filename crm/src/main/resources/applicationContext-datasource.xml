@@ -24,7 +24,7 @@
     </bean>
     <!-- mapper注解扫描器配置,扫描@MapperScan注解,自动生成代码对象 -->
     <bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.wzl.crm.mapper"/>
+        <property name="basePackage" value="com.wzl.crm.settings.mapper"/>
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
     </bean>
     <!-- 配置事务管理器 -->
@@ -49,3 +49,4 @@
     </tx:advice>
 </beans>
 
+<!--myBatis配置文件-->

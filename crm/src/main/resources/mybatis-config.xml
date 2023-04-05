@@ -9,9 +9,9 @@
     </settings>
     <!--类起别名-->
     <typeAliases>
-        <package name="com.wzl.crm.model"/>
+        <package name="com.wzl.crm.workbench.domain"/>
     </typeAliases>
     <mappers>
-        <package name="com.wzl.crm.mapper"/>
+        <package name="com.wzl.crm.settings.mapper"/>
     </mappers>
 </configuration>
