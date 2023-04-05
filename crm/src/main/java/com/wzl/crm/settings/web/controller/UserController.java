@@ -1,6 +1,8 @@
 package com.wzl.crm.settings.web.controller;
 
+import com.wzl.crm.commons.contants.Contants;
 import com.wzl.crm.commons.domain.ReturnObject;
+import com.wzl.crm.commons.utils.DateUtils;
 import com.wzl.crm.settings.service.UserService;
 import com.wzl.crm.workbench.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -48,30 +51,23 @@ public class UserController {
 		ReturnObject returnObject = new ReturnObject();
 		//根据查询结果响应信息
 		if (user == null) {// 登录失败，用户名或密码错误
-			returnObject.setCode("0");
+			returnObject.setCode(Contants.RETURN_OBJECT_CODE_FAIL);
 			returnObject.setMessage("用户名或密码错误");
-
-		} else {//进一步判断账号是否合法
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String nowTime = sdf.format(new Date());
-			if (nowTime.compareTo(user.getExpireTime()) > 0) { //时间失效了
-				returnObject.setCode("0");
-				returnObject.setMessage("账号过期");
-			} else if ("0".equals(user.getLockState())) { //0 锁定了 失败
-				returnObject.setCode("0");
-				returnObject.setMessage("账号锁定");
-			} else if (!user.getAllowIps().contains(request.getRemoteAddr())) { // ip地址不在范围
-				System.out.println(request.getRemoteAddr());
-				returnObject.setCode("0");
-				returnObject.setMessage("ip受限");
-			} else {//登录成功
-				returnObject.setCode("1");
-			}
-
+		} else if (DateUtils.formateDateTime(new Date()).compareTo(user.getExpireTime()) > 0) { //时间失效了
+			returnObject.setCode(Contants.RETURN_OBJECT_CODE_FAIL);
+			returnObject.setMessage("账号过期");
+		} else if ("0".equals(user.getLockState())) { //0 锁定了 失败
+			returnObject.setCode(Contants.RETURN_OBJECT_CODE_FAIL);
+			returnObject.setMessage("账号锁定");
+		} else if (!user.getAllowIps().contains(request.getRemoteAddr())) { // ip地址不在范围
+			returnObject.setCode(Contants.RETURN_OBJECT_CODE_FAIL);
+			returnObject.setMessage("ip受限");
+		} else {//登录成功
+			returnObject.setCode(Contants.RETURN_OBJECT_CODE_SUCCESS);
+			HttpSession session = request.getSession();
+			session.setAttribute("username",user.getName());
 		}
 		return returnObject;
-
 	}
-
 
 }

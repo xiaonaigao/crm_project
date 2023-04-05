@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/" + request.getContextPath() + "/";
+    String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/";
 %>
 <html>
 <head>
@@ -35,7 +35,7 @@
                         isRemPwd:isRemPwd
                     },
                     type:'post',
-                    //解析返回的json
+                    //解析返回的json------
                     dataType:'json',
                     success:function (data) {
                         if (data.code=="1"){
