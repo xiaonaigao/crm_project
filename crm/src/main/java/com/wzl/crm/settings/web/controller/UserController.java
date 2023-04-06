@@ -29,7 +29,7 @@ public class UserController {
 	/**
 	 * 点击主页跳转到登录
 	 */
-	@RequestMapping("settings/qx/user/toLogin.do")
+	@RequestMapping("/settings/qx/user/toLogin.do")
 	public String toLogin() {
 		return "settings/qx/user/login";
 	}
@@ -40,7 +40,7 @@ public class UserController {
 	 * 通用性高，返回Object
 	 * ResponseBody--转换json
 	 */
-	@RequestMapping("settings/qx/user/login.do")
+	@RequestMapping("/settings/qx/user/login.do")
 	public @ResponseBody
 	Object login(String loginAct, String loginPwd, String isRemPwd, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
 		//封装参数
@@ -81,9 +81,9 @@ public class UserController {
 				c2.setMaxAge(10 * 24 * 60 * 60);
 				//保存到浏览器
 				response.addCookie(c2);
-			}else {
+			} else {
 				//删除之前cookie
-				Cookie c1 = new Cookie("loginAct","1");//账号
+				Cookie c1 = new Cookie("loginAct", "1");//账号
 				//设置生命周期
 				c1.setMaxAge(0);
 				//保存到浏览器
@@ -96,6 +96,28 @@ public class UserController {
 			}
 		}
 		return returnObject;
+	}
+
+	/**
+	 * 安全退出
+	 */
+	@RequestMapping("/settings/qx/user/logout.do")
+	public String logout(HttpServletResponse response,HttpSession session) {
+		//清空cookie
+		//删除之前cookie
+		Cookie c1 = new Cookie("loginAct", "1");//账号
+		//设置生命周期
+		c1.setMaxAge(0);
+		//保存到浏览器
+		response.addCookie(c1);
+		Cookie c2 = new Cookie("loginPwd", "1");//密码
+		//设置生命周期
+		c2.setMaxAge(0);
+		//保存到浏览器
+		response.addCookie(c2);
+		//删除Session
+		session.invalidate();
+		return "redirect:/";
 	}
 
 }

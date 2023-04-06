@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/";
@@ -24,7 +25,7 @@
                 // 收集参数,并且去除空格
                 var loginAct = $.trim($("#loginAct").val());
                 var loginPwd = $.trim($("#loginPwd").val());
-                var isRemPwd = $("#isRemPwd").prop("checked");
+                var isRemPwd = $('input[name="isRemPwd"]').prop("checked");
                 // 表单验证
                 if (loginAct == "") {
                     alert("用户名不为空");
@@ -91,10 +92,10 @@
                 <div class="checkbox" style="position: relative;top: 30px; left: 10px;">
                     <label>
                         <c:if test="${not empty cookie.loginAct and not empty cookie.loginPwd}">
-                            <input type="checkbox" id="isRemPwd" checked>
+                            <input type="checkbox" name="isRemPwd" checked>
                         </c:if>
                         <c:if test="${empty cookie.loginAct or empty cookie.loginPwd}">
-                            <input type="checkbox" id="isRemPwd">
+                            <input type="checkbox" name="isRemPwd">
                         </c:if>
                         十天内免登录&nbsp;&nbsp;
                     </label>
