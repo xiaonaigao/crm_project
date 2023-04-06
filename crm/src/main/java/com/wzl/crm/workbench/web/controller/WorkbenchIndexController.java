@@ -13,4 +13,5 @@ public class WorkbenchIndexController {
 	public String index(){
 		return "workbench/index";
 	}
+
 }

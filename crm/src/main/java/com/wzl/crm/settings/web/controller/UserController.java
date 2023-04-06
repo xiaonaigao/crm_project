@@ -117,6 +117,7 @@ public class UserController {
 		response.addCookie(c2);
 		//删除Session
 		session.invalidate();
+		// 结束SpringMVC框架重定向
 		return "redirect:/";
 	}
 
