@@ -2,6 +2,7 @@ package com.wzl.crm.settings.mapper;
 
 import com.wzl.crm.workbench.domain.User;
 
+import java.util.List;
 import java.util.Map;
 
 public interface UserMapper {
@@ -57,4 +58,9 @@ public interface UserMapper {
      * 根据用户名和密码查询对象
      */
     User selectUserByLoginActAndPwd(Map<String,Object> map);
+
+    /**
+     * 查询所有用户
+     */
+    List<User> selectAllUsers();
 }

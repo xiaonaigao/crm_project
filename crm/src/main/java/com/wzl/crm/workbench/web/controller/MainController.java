@@ -17,11 +17,4 @@ public class MainController {
 	public String index(){
 		return "workbench/main/index";
 	}
-	/**
-	 * 市场活动
-	 */
-	@RequestMapping("/workbench/activity/index.do")
-	public String activityIndex(){
-		return "workbench/activity/index";
-	}
 }
