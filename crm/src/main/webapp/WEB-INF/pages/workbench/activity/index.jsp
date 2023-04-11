@@ -70,24 +70,24 @@
                 }
                 //2.发送请求
                 $.ajax({
-                    url:'workbench/activity/saveCreateActivity.do',
-                    data:{
-                        owner:owner,
-                        name:name,
-                        startDate:startDate,
-                        endDate:endDate,
-                        cost:cost,
-                        description:description
+                    url: 'workbench/activity/saveCreateActivity.do',
+                    data: {
+                        owner: owner,
+                        name: name,
+                        startDate: startDate,
+                        endDate: endDate,
+                        cost: cost,
+                        description: description
                     },
-                    type:'post',
-                    dataType:'json',
+                    type: 'post',
+                    dataType: 'json',
                     //2.1 处理响应
-                    success:function (data) {
-                        if (data.code == "1"){// 成功
+                    success: function (data) {
+                        if (data.code == "1") {// 成功
                             //1.关闭模态窗口
                             $("#createActivityModal").modal("hide");
                             //2. 刷新未做
-                        }else {
+                        } else {
                             //提示
                             alert(data.message);
                             $("#createActivityModal").modal("show");
@@ -97,25 +97,74 @@
 
             });
 
-            // 1.创建---当容器加载完之后，对容器调用工具函数
-            $("#create-startTime").datetimepicker({
-                language:'zh-CN',//语言
-                format:'yyyy-mm-dd',//日期的格式
-                minView:'month',//选择最小的视图
-                initialDate:new Date(),//初始化显示日期
-                autoclose:true,//选择后自动关闭
-                todayBtn:true,//显示今天的按钮
-                clearBtn:true//清空按钮
+            // 1.创建---日期js
+            $(".my-date").datetimepicker({
+                language: 'zh-CN',//语言
+                format: 'yyyy-mm-dd',//日期的格式
+                minView: 'month',//选择最小的视图
+                initialDate: new Date(),//初始化显示日期
+                autoclose: true,//选择后自动关闭
+                todayBtn: true,//显示今天的按钮
+                clearBtn: true//清空按钮
             });
-            $("#create-endTime").datetimepicker({
-                language:'zh-CN',//语言
-                format:'yyyy-mm-dd',//日期的格式
-                minView:'month',//选择最小的视图
-                initialDate:new Date(),//初始化显示日期
-                autoclose:true,//选择后自动关闭
-                todayBtn:true,//显示今天的按钮
-                clearBtn:true//清空按钮
+
+            //2.查询。当市场活动主页面加载完成，查询所有数据的第一页和总条数
+            queryActivityByConditionForPage();
+
+            //3.按条件查询
+            $("#queryActivityBtn").click(function () {
+                //按照条件查询
+                queryActivityByConditionForPage();
             });
+
+            function queryActivityByConditionForPage(){
+                //2.查询。当市场活动主页面加载完成，查询所有数据的第一页和总条数
+                //2.1收集查询的参数
+                var name = $("#query-name").val();
+                var owner = $("#query-owner").val();
+                var startDate = $("#query-startDate").val();
+                var endDate = $("#query-endDate").val();
+                var pageNo = 1;//页码
+                var pageSize = 10;//显示的数量
+                //2.2发送请求
+                $.ajax({
+                    url: 'workbench/activity/queryActivityByConditionForPage.do',
+                    data: {
+                        name: name,
+                        owner: owner,
+                        startDate: startDate,
+                        endDate: endDate,
+                        pageNo: pageNo,
+                        pageSize: pageSize
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    //2.3处理响应 data有两个数据，一个是数组，一个是int
+                    success: function (data) {
+                        // 总条数
+                        $("#totalRowsB").text(data.totalRows);//把查询的数据放在totalRowsB的标签里
+                        // 遍历数组列表activityList $.each(遍历的数组，回调函数(index遍历的下标,obj循环变量))
+                        // 定义字符串，存放市场活动列表数据
+                        var htmlStr = "";
+                        $.each(data.activityList, function (index, obj) {
+                            // obj和this都是取出的数组元素,htmlStr进行字符串拼接
+                            htmlStr += "<tr class=\"active\">";
+                            htmlStr += "<td><input type=\"checkbox\" value=\"" + obj.id + "\"/></td>";
+                            htmlStr += " <td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='detail.html';\">" + obj.name + "</a></td>";
+                            htmlStr += "<td>" + obj.owner + "</td>";
+                            htmlStr += " <td>" + obj.startDate + "</td>";
+                            htmlStr += " <td>" + obj.endDate + "</td>";
+                            htmlStr += "</tr>";
+                        });
+                        // 把拼接好的表格字符串 插入到 显示的<tbody>
+                        // text()显示文本信息不能有标签，html()可以有标签
+                        $("#tBody").html(htmlStr);
+                    }
+
+
+                });
+            }
+
 
         });
 
@@ -157,11 +206,11 @@
                     <div class="form-group">
                         <label for="create-startTime" class="col-sm-2 control-label">开始日期</label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <input type="text" class="form-control" id="create-startTime" readonly>
+                            <input type="text" class="form-control my-date" id="create-startTime" readonly>
                         </div>
                         <label for="create-endTime" class="col-sm-2 control-label">结束日期</label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <input type="text" class="form-control" id="create-endTime" readonly>
+                            <input type="text" class="form-control my-date" id="create-endTime" readonly>
                         </div>
                     </div>
                     <div class="form-group">
@@ -223,11 +272,11 @@
                     <div class="form-group">
                         <label for="edit-startTime" class="col-sm-2 control-label">开始日期</label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <input type="text" class="form-control" id="edit-startTime" readonly>
+                            <input type="text" class="form-control my-date" id="edit-startTime" readonly>
                         </div>
                         <label for="edit-endTime" class="col-sm-2 control-label">结束日期</label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <input type="text" class="form-control" id="edit-endTime" readonly>
+                            <input type="text" class="form-control my-date" id="edit-endTime" readonly>
                         </div>
                     </div>
 
@@ -311,14 +360,14 @@
                 <div class="form-group">
                     <div class="input-group">
                         <div class="input-group-addon">名称</div>
-                        <input class="form-control" type="text">
+                        <input class="form-control" type="text" id="query-name">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="input-group">
                         <div class="input-group-addon">所有者</div>
-                        <input class="form-control" type="text">
+                        <input class="form-control" type="text" id="query-owner">
                     </div>
                 </div>
 
@@ -326,17 +375,17 @@
                 <div class="form-group">
                     <div class="input-group">
                         <div class="input-group-addon">开始日期</div>
-                        <input class="form-control" type="text" id="startTime"/>
+                        <input class="form-control my-date" type="text" id="query-startDate"/>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="input-group">
                         <div class="input-group-addon">结束日期</div>
-                        <input class="form-control" type="text" id="endTime">
+                        <input class="form-control my-date" type="text" id="query-endDate">
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-default">查询</button>
+                <button type="button" class="btn btn-default" id="queryActivityBtn">查询</button>
 
             </form>
         </div>
@@ -374,30 +423,24 @@
                     <td>结束日期</td>
                 </tr>
                 </thead>
-                <tbody>
-                <tr class="active">
-                    <td><input type="checkbox"/></td>
-                    <td><a style="text-decoration: none; cursor: pointer;"
-                           onclick="window.location.href='detail.html';">发传单</a></td>
-                    <td>zhangsan</td>
-                    <td>2020-10-10</td>
-                    <td>2020-10-20</td>
-                </tr>
-                <tr class="active">
-                    <td><input type="checkbox"/></td>
-                    <td><a style="text-decoration: none; cursor: pointer;"
-                           onclick="window.location.href='detail.html';">发传单</a></td>
-                    <td>zhangsan</td>
-                    <td>2020-10-10</td>
-                    <td>2020-10-20</td>
-                </tr>
+                <tbody id="tBody">
+                <%--                js遍历的时候在这里拼接--%>
+                <%--                <tr class="active">--%>
+                <%--                    <td><input type="checkbox"/></td>--%>
+                <%--                    <td><a style="text-decoration: none; cursor: pointer;"--%>
+                <%--                           onclick="window.location.href='detail.html';">发传单</a></td>--%>
+                <%--                    <td>zhangsan</td>--%>
+                <%--                    <td>2020-10-10</td>--%>
+                <%--                    <td>2020-10-20</td>--%>
+                <%--                </tr>--%>
                 </tbody>
             </table>
         </div>
 
         <div style="height: 50px; position: relative;top: 30px;">
             <div>
-                <button type="button" class="btn btn-default" style="cursor: default;">共<b>50</b>条记录</button>
+                <button type="button" class="btn btn-default" style="cursor: default;">共<b id="totalRowsB">50</b>条记录
+                </button>
             </div>
             <div class="btn-group" style="position: relative;top: -34px; left: 110px;">
                 <button type="button" class="btn btn-default" style="cursor: default;">显示</button>
