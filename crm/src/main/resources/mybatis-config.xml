@@ -13,5 +13,6 @@
     </typeAliases>
     <mappers>
         <package name="com.wzl.crm.settings.mapper"/>
+        <package name="com.wzl.crm.workbench.mapper"/>
     </mappers>
 </configuration>

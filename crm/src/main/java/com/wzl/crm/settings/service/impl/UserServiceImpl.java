@@ -13,7 +13,7 @@ import java.util.Map;
  * @author wang
  * @version 1.0
  */
-@Service
+@Service("userService")
 public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserMapper userMapper;

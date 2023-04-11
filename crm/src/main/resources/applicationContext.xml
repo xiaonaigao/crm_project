@@ -20,6 +20,7 @@ http://www.springframework.org/schema/aop/spring-aop.xsd">
     <!-- 扫描注解 -->
     <context:component-scan base-package="com.wzl.crm.commons"/>
     <context:component-scan base-package="com.wzl.crm.settings.service"/>
+    <context:component-scan base-package="com.wzl.crm.workbench.service"/>
     <!-- 导入数据相关配置 -->
     <import resource="applicationContext-datasource.xml"/>
 </beans>
