@@ -10,14 +10,16 @@
     <link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet"/>
     <link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" type="text/css"
           rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="jquery/bs_pagination-master/css/jquery.bs_pagination.min.css">
+
     <script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
     <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
     <script type="text/javascript"
             src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
-
+    <script type="text/javascript" src="jquery/bs_pagination-master/js/jquery.bs_pagination.min.js"></script>
+    <script type="text/javascript" src="jquery/bs_pagination-master/localization/en.js"></script>
     <script type="text/javascript">
-
         $(function () {
             //1.创建---创建按钮单击事件
             $("#createActivityBtn").click(function () {
@@ -86,7 +88,8 @@
                         if (data.code == "1") {// 成功
                             //1.关闭模态窗口
                             $("#createActivityModal").modal("hide");
-                            //2. 刷新未做
+                            //2. 刷新查询
+                            queryActivityByConditionForPage(1, 10);
                         } else {
                             //提示
                             alert(data.message);
@@ -109,64 +112,251 @@
             });
 
             //2.查询。当市场活动主页面加载完成，查询所有数据的第一页和总条数
-            queryActivityByConditionForPage();
+            queryActivityByConditionForPage(1, 10);
 
             //3.按条件查询
             $("#queryActivityBtn").click(function () {
                 //按照条件查询
-                queryActivityByConditionForPage();
+                queryActivityByConditionForPage(1, 10);
             });
 
-            function queryActivityByConditionForPage(){
-                //2.查询。当市场活动主页面加载完成，查询所有数据的第一页和总条数
-                //2.1收集查询的参数
-                var name = $("#query-name").val();
-                var owner = $("#query-owner").val();
-                var startDate = $("#query-startDate").val();
-                var endDate = $("#query-endDate").val();
-                var pageNo = 1;//页码
-                var pageSize = 10;//显示的数量
-                //2.2发送请求
+            //4.全选： 按钮添加单击事件
+            $("#chckAll").click(function () {
+                //判断 如果全选按钮选中，列表都选中checkbox
+                // if(this.checked==true){
+                //     $("#tBody input[type='checkbox']").prop("checked",true); //获取表格列表下的checkbox
+                // }else{
+                //     $("#tBody input[type='checkbox']").prop("checked",false); //获取表格列表下的checkbox
+                // }
+                $("#tBody input[type='checkbox']").prop("checked", this.checked);
+            });
+
+            //4.全选：单个框全选后，全选框也选中
+            $("#tBody").on("click", "input[type='checkbox']", function () {
+                // 所有的checkbox全部选中，全选也选中
+                if ($("#tBody input[type='checkbox']").size() == $("#tBody input[type='checkbox']:checked").size()) {
+                    $("#chckAll").prop("checked", true);
+                } else {
+                    $("#chckAll").prop("checked", false);
+                }
+            });
+
+            //5.删除： 删除按钮
+            $("#deleteBtn").click(function () {
+                // 收集参数
+                // 5.1获取列表中选中的checkbox
+                var checkedIds = $("#tBody input[type='checkbox']:checked");
+                if (checkedIds.size() == 0) {
+                    alert("请选择删除的事件");
+                    return;
+                }
+
+                if (window.confirm("确定删除吗？")) {
+                    //5.2获取id--遍历数组
+                    // this 就是每次遍历的值
+                    // 把id=xxx&id=xxx...&id=xxx发送到后台
+                    var ids = "";
+                    $.each(checkedIds, function () {
+                        ids += "id=" + this.value + "&";
+                    });
+                    // 取出&
+                    ids = ids.substr(0, ids.length - 1);
+
+                    //5.3发送请求
+                    $.ajax({
+                        url: 'workbench/activity/deleteActivityIds.do',
+                        data: ids,
+                        type: 'post',
+                        //响应
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.code == '1') {
+                                //删除成功
+                                //刷新
+                                queryActivityByConditionForPage(1, 10);
+                            } else {
+                                alert(data.message);
+                            }
+                        }
+                    });
+                }
+
+            });
+
+
+            //修改
+            //修改1.查询
+            $("#editActivityBtn").click(function () {
+                //收集参数获取选中的checkbox
+                var checkedIds = $("#tBody input[type='checkbox']:checked");
+                if (checkedIds.size() == 0) {
+                    alert("请选择修改的事件");
+                    return;
+                }
+                //只能选择1个
+                if (checkedIds.size() == 1) {
+                    var id = checkedIds[0].value;
+                    //1发送请求
+                    $.ajax({
+                        url: 'workbench/activity/selectActivityById.do',
+                        data: {
+                            id: id
+                        },
+                        type: 'post',
+                        // 2处理响应
+                        dataType: 'json',
+                        success: function (data) {
+                            //查询成功
+                            $("#edit-id").val(data.id);
+                            $("#edit-marketActivityOwner").val(data.owner);
+                            $("#edit-marketActivityName").val(data.name);
+                            $("#edit-startTime").val(data.startDate);
+                            $("#edit-endTime").val(data.endDate);
+                            $("#edit-cost").val(data.cost);
+                            $("#edit-describe").val(data.description);
+                            // 弹出创建市场模态窗口
+                            $("#editActivityModal").modal("show");
+                        }
+                    });
+                } else {
+                    alert("只能选择一条修改");
+                    return;
+                }
+            });
+
+            //修改 2 保存
+            $("#updateSaveBtn").click(function () {
+                //2.1封装参数
+                var id = $("#edit-id").val();
+                var name = $.trim($("#edit-marketActivityName").val());
+                var owner = $("#edit-marketActivityOwner").val();
+                var startDate = $("#edit-startTime").val();
+                var endDate = $("#edit-endTime").val();
+                var cost = $("#edit-cost").val();
+                var description = $.trim($("#edit-describe").val());
+                //2.2表单验证
+                if (owner == "") {
+                    alert("所有者不能为空");
+                    return;
+                }
+                if (name == "") {
+                    alert("名称不能为空");
+                    return;
+                }
+                if (startDate != "" && endDate != "") {
+                    // 使用字符串大小进行日期比较
+                    if (startDate > endDate) {
+                        alert("开始日期不能大于结束日期");
+                        return;
+                    }
+                }
+                // 正则表达式验证成本：成本只能为非负整数
+                var regExp = /^(([1-9]\d*)|0)$/;
+                if (!regExp.test(cost)) {
+                    alert("成本只能为非负整数");
+                    return;
+                }
+
+                //2.2 发送请求
                 $.ajax({
-                    url: 'workbench/activity/queryActivityByConditionForPage.do',
+                    url: 'workbench/activity/editActivityById.do',
                     data: {
+                        id: id,
                         name: name,
                         owner: owner,
                         startDate: startDate,
                         endDate: endDate,
-                        pageNo: pageNo,
-                        pageSize: pageSize
+                        cost: cost,
+                        description: description
                     },
                     type: 'post',
+                    //做出响应
                     dataType: 'json',
-                    //2.3处理响应 data有两个数据，一个是数组，一个是int
                     success: function (data) {
-                        // 总条数
-                        $("#totalRowsB").text(data.totalRows);//把查询的数据放在totalRowsB的标签里
-                        // 遍历数组列表activityList $.each(遍历的数组，回调函数(index遍历的下标,obj循环变量))
-                        // 定义字符串，存放市场活动列表数据
-                        var htmlStr = "";
-                        $.each(data.activityList, function (index, obj) {
-                            // obj和this都是取出的数组元素,htmlStr进行字符串拼接
-                            htmlStr += "<tr class=\"active\">";
-                            htmlStr += "<td><input type=\"checkbox\" value=\"" + obj.id + "\"/></td>";
-                            htmlStr += " <td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='detail.html';\">" + obj.name + "</a></td>";
-                            htmlStr += "<td>" + obj.owner + "</td>";
-                            htmlStr += " <td>" + obj.startDate + "</td>";
-                            htmlStr += " <td>" + obj.endDate + "</td>";
-                            htmlStr += "</tr>";
-                        });
-                        // 把拼接好的表格字符串 插入到 显示的<tbody>
-                        // text()显示文本信息不能有标签，html()可以有标签
-                        $("#tBody").html(htmlStr);
+                        if (data.code == '1') {
+                            // 当前页
+                            $("#editActivityModal").modal("hide");
+                            queryActivityByConditionForPage($("#pagDiv").bs_pagination('getOption', 'currentPage'),
+                                $("#pagDiv").bs_pagination('getOption', 'rowsPerPage'));
+                        } else {
+                            alert(data.message);
+                        }
                     }
-
-
                 });
-            }
+            });
 
 
         });
+
+        function queryActivityByConditionForPage(pageNo, pageSize) {
+            //2.查询。当市场活动主页面加载完成，查询所有数据的第一页和总条数
+            //2.1收集查询的参数
+            var name = $("#query-name").val();
+            var owner = $("#query-owner").val();
+            var startDate = $("#query-startDate").val();
+            var endDate = $("#query-endDate").val();
+            // var pageNo = 1;//页码
+            // var pageSize = 10;//显示的数量
+            //2.2发送请求
+            $.ajax({
+                url: 'workbench/activity/queryActivityByConditionForPage.do',
+                data: {
+                    name: name,
+                    owner: owner,
+                    startDate: startDate,
+                    endDate: endDate,
+                    pageNo: pageNo,
+                    pageSize: pageSize
+                },
+                type: 'post',
+                dataType: 'json',
+                //2.3处理响应 data有两个数据，一个是数组，一个是int
+                success: function (data) {
+                    // 总条数
+                    $("#totalRowsB").text(data.totalRows);//把查询的数据放在totalRowsB的标签里
+                    // 遍历数组列表activityList $.each(遍历的数组，回调函数(index遍历的下标,obj循环变量))
+                    // 定义字符串，存放市场活动列表数据
+                    var htmlStr = "";
+                    $.each(data.activityList, function (index, obj) {
+                        // obj和this都是取出的数组元素,htmlStr进行字符串拼接
+                        htmlStr += "<tr class=\"active\">";
+                        htmlStr += "<td><input type=\"checkbox\" style='width: 15px;height: 15px' value=\"" + obj.id + "\"/></td>";
+                        htmlStr += " <td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='detail.html';\">" + obj.name + "</a></td>";
+                        htmlStr += "<td>" + obj.owner + "</td>";
+                        htmlStr += " <td>" + obj.startDate + "</td>";
+                        htmlStr += " <td>" + obj.endDate + "</td>";
+                        htmlStr += "</tr>";
+                    });
+                    // 把拼接好的表格字符串 插入到 显示的<tbody>
+                    // text()显示文本信息不能有标签，html()可以有标签
+                    $("#tBody").html(htmlStr);
+
+
+                    //计算页码数
+                    var totalPages = data.totalRows / pageSize;
+                    if (data.totalRows % pageSize > 0) {
+                        totalPages = parseInt(data.totalRows / pageSize) + 1;
+                    }
+                    // 调用页码翻页函数
+                    $("#pagDiv").bs_pagination({
+                        currentPage: pageNo,//当前页码数
+                        rowsPerPage: pageSize,//每页显示条数
+                        totalRows: data.totalRows,//总条数
+                        totalPages: totalPages,//总页数
+                        visiblePageLinks: 5,//最多显示的卡片数
+                        showGoToPage: true,//显示“跳转到部分
+                        showRowsPerPage: true,//每页显示条数
+                        showRowsInfo: false,//是否显示记录的信息
+                        //用户切换页码，触发函数，返回页码之后的pageNo和pageSize
+                        onChangePage: function (event, pageObj) {
+                            queryActivityByConditionForPage(pageObj.currentPage, pageObj.rowsPerPage);
+                            //取消全选按钮
+                            $("#chckAll").prop("checked", false);
+                        }
+                    });
+                }
+            });
+        }
 
     </script>
 </head>
@@ -251,7 +441,8 @@
             <div class="modal-body">
 
                 <form class="form-horizontal" role="form">
-
+                    <!--设置一个隐藏标签，用来存放id，供后面修改数据时操作-->
+                    <input type="hidden" id="edit-id">
                     <div class="form-group">
                         <label for="edit-marketActivityOwner" class="col-sm-2 control-label">所有者<span
                                 style="font-size: 15px; color: red;">*</span></label>
@@ -265,7 +456,7 @@
                         <label for="edit-marketActivityName" class="col-sm-2 control-label">名称<span
                                 style="font-size: 15px; color: red;">*</span></label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <input type="text" class="form-control" id="edit-marketActivityName" value="发传单">
+                            <input type="text" class="form-control" id="edit-marketActivityName">
                         </div>
                     </div>
 
@@ -299,7 +490,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal">更新</button>
+                <button type="button" class="btn btn-primary" id="updateSaveBtn">更新</button>
             </div>
         </div>
     </div>
@@ -395,10 +586,12 @@
                 <button type="button" class="btn btn-primary" id="createActivityBtn"><span
                         class="glyphicon glyphicon-plus"></span> 创建
                 </button>
-                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#editActivityModal"><span
+                <button type="button" class="btn btn-default" id="editActivityBtn"><span
                         class="glyphicon glyphicon-pencil"></span> 修改
                 </button>
-                <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+                <button type="button" class="btn btn-danger" id="deleteBtn"><span
+                        class="glyphicon glyphicon-minus"></span> 删除
+                </button>
             </div>
             <div class="btn-group" style="position: relative; top: 18%;">
                 <button type="button" class="btn btn-default" data-toggle="modal" data-target="#importActivityModal">
@@ -411,12 +604,16 @@
                         class="glyphicon glyphicon-export"></span> 下载列表数据（选择导出）
                 </button>
             </div>
+            <div class="btn-group" style="position: relative; top: 18%;">
+                <button type="button" class="btn btn-default" style="cursor: default;">共<b id="totalRowsB">50</b>条记录
+                </button>
+            </div>
         </div>
         <div style="position: relative;top: 10px;">
             <table class="table table-hover">
                 <thead>
                 <tr style="color: #B3B3B3;">
-                    <td><input type="checkbox"/></td>
+                    <td><input type="checkbox" id="chckAll" style='width: 15px;height: 15px'/></td>
                     <td>名称</td>
                     <td>所有者</td>
                     <td>开始日期</td>
@@ -435,43 +632,46 @@
                 <%--                </tr>--%>
                 </tbody>
             </table>
+            <%--下一页上一页--%>
+            <div id="pagDiv">
+            </div>
         </div>
 
-        <div style="height: 50px; position: relative;top: 30px;">
-            <div>
-                <button type="button" class="btn btn-default" style="cursor: default;">共<b id="totalRowsB">50</b>条记录
-                </button>
-            </div>
-            <div class="btn-group" style="position: relative;top: -34px; left: 110px;">
-                <button type="button" class="btn btn-default" style="cursor: default;">显示</button>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                        10
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">20</a></li>
-                        <li><a href="#">30</a></li>
-                    </ul>
-                </div>
-                <button type="button" class="btn btn-default" style="cursor: default;">条/页</button>
-            </div>
-            <div style="position: relative;top: -88px; left: 285px;">
-                <nav>
-                    <ul class="pagination">
-                        <li class="disabled"><a href="#">首页</a></li>
-                        <li class="disabled"><a href="#">上一页</a></li>
-                        <li class="active"><a href="#">1</a></li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">4</a></li>
-                        <li><a href="#">5</a></li>
-                        <li><a href="#">下一页</a></li>
-                        <li class="disabled"><a href="#">末页</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
+        <%--        <div style="height: 50px; position: relative;top: 30px;">--%>
+        <%--            <div>--%>
+        <%--                <button type="button" class="btn btn-default" style="cursor: default;">共<b id="totalRowsB">50</b>条记录--%>
+        <%--                </button>--%>
+        <%--            </div>--%>
+        <%--            <div class="btn-group" style="position: relative;top: -34px; left: 110px;">--%>
+        <%--                <button type="button" class="btn btn-default" style="cursor: default;">显示</button>--%>
+        <%--                <div class="btn-group">--%>
+        <%--                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">--%>
+        <%--                        10--%>
+        <%--                        <span class="caret"></span>--%>
+        <%--                    </button>--%>
+        <%--                    <ul class="dropdown-menu" role="menu">--%>
+        <%--                        <li><a href="#">20</a></li>--%>
+        <%--                        <li><a href="#">30</a></li>--%>
+        <%--                    </ul>--%>
+        <%--                </div>--%>
+        <%--                <button type="button" class="btn btn-default" style="cursor: default;">条/页</button>--%>
+        <%--            </div>--%>
+        <%--            <div style="position: relative;top: -88px; left: 285px;">--%>
+        <%--                <nav>--%>
+        <%--                    <ul class="pagination">--%>
+        <%--                        <li class="disabled"><a href="#">首页</a></li>--%>
+        <%--                        <li class="disabled"><a href="#">上一页</a></li>--%>
+        <%--                        <li class="active"><a href="#">1</a></li>--%>
+        <%--                        <li><a href="#">2</a></li>--%>
+        <%--                        <li><a href="#">3</a></li>--%>
+        <%--                        <li><a href="#">4</a></li>--%>
+        <%--                        <li><a href="#">5</a></li>--%>
+        <%--                        <li><a href="#">下一页</a></li>--%>
+        <%--                        <li class="disabled"><a href="#">末页</a></li>--%>
+        <%--                    </ul>--%>
+        <%--                </nav>--%>
+        <%--            </div>--%>
+        <%--        </div>--%>
 
     </div>
 

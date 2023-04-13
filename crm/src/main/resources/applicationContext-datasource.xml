@@ -48,5 +48,3 @@
         </tx:attributes>
     </tx:advice>
 </beans>
-
-<!--myBatis配置文件-->

@@ -22,7 +22,7 @@ import java.util.*;
  * @version 1.0
  */
 @Controller
-public class ActivityController{
+public class ActivityController {
 	/**
 	 * 注入UserService
 	 */
@@ -33,22 +33,25 @@ public class ActivityController{
 	 */
 	@Autowired
 	private ActivityService activityService;
+
 	/**
 	 * 市场活动首页
 	 */
 	@RequestMapping("/workbench/activity/index.do")
-	public String activityIndex(HttpServletRequest request){
+	public String activityIndex(HttpServletRequest request) {
 		//调用service层方法，查询所有用户
 		List<User> userList = userService.queryAllUsers();
 		//存放request
-		request.setAttribute("userList",userList);
+		request.setAttribute("userList", userList);
 		return "workbench/activity/index";
 	}
+
 	/**
 	 * 创建市场活动
 	 */
 	@RequestMapping("/workbench/activity/saveCreateActivity.do")
-	public @ResponseBody Object saveCreateActivity(Activity activity, HttpSession session){
+	public @ResponseBody
+	Object saveCreateActivity(Activity activity, HttpSession session) {
 		// 封装参数--下面3个需要自己输入
 		activity.setId(UUIDUtils.getUUID());
 		User user = (User) session.getAttribute(Contants.SESSION_USER);
@@ -59,9 +62,9 @@ public class ActivityController{
 		ReturnObject returnObject = new ReturnObject();
 		try {
 			int ret = activityService.saveCreateActivity(activity);
-			if (ret>0){
+			if (ret > 0) {
 				returnObject.setCode(Contants.RETURN_OBJECT_CODE_SUCCESS);
-			}else {
+			} else {
 				returnObject.setCode(Contants.RETURN_OBJECT_CODE_FAIL);
 				returnObject.setMessage("系统忙，请稍后再试...");
 			}
@@ -77,23 +80,91 @@ public class ActivityController{
 	 * 根据条件，分页
 	 */
 	@RequestMapping("/workbench/activity/queryActivityByConditionForPage.do")
-	public @ResponseBody Object queryActivityByConditionForPage(String name,String owner,String startDate,String endDate,int pageNo,int pageSize){
+	public @ResponseBody
+	Object queryActivityByConditionForPage(String name, String owner, String startDate, String endDate, int pageNo, int pageSize) {
 		//封装参数
-		Map<String,Object> map = new HashMap<>();
-		map.put("name",name);
-		map.put("owner",owner);
-		map.put("startDate",startDate);
-		map.put("endDate",endDate);
-		map.put("beginNo",(pageNo-1)*pageSize);
-		map.put("pageSize",pageSize);
+		Map<String, Object> map = new HashMap<>();
+		map.put("name", name);
+		map.put("owner", owner);
+		map.put("startDate", startDate);
+		map.put("endDate", endDate);
+		map.put("beginNo", (pageNo - 1) * pageSize);
+		map.put("pageSize", pageSize);
 		//调用Service
 		List<Activity> activityList = activityService.queryActivityByConditionForPage(map);
 		int totalRows = activityService.queryCountOfActivityByCondition(map);
 		//生成响应信息
-		Map<String,Object> retMap = new HashMap<>();
-		retMap.put("activityList",activityList);
-		retMap.put("totalRows",totalRows);
+		Map<String, Object> retMap = new HashMap<>();
+		retMap.put("activityList", activityList);
+		retMap.put("totalRows", totalRows);
 		return retMap;
 	}
 
+	/**
+	 * 根据id删除
+	 *
+	 * @return
+	 */
+	@RequestMapping("/workbench/activity/deleteActivityIds.do")
+	public @ResponseBody
+	Object deleteActivityIds(String[] id) {
+		ReturnObject returnObject = new ReturnObject();
+		try {
+			// 调用service方法
+			int ret = activityService.deleteActivityByIds(id);
+			if (ret > 0) {
+				returnObject.setCode(Contants.RETURN_OBJECT_CODE_SUCCESS);
+			} else {
+				returnObject.setCode(Contants.RETURN_OBJECT_CODE_FAIL);
+				returnObject.setMessage("系统忙，请稍后再试...");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			returnObject.setCode(Contants.RETURN_OBJECT_CODE_FAIL);
+			returnObject.setMessage("系统忙，请稍后再试...");
+		}
+		return returnObject;
+	}
+
+	/**
+	 * 根据id修改--1查询
+	 */
+	@RequestMapping("/workbench/activity/selectActivityById.do")
+	public @ResponseBody
+	Object selectActivityById(String id) {
+		Activity activity = activityService.queryActivityById(id);
+		return activity;
+	}
+
+	/**
+	 * 根据id修改--2保存
+	 */
+	@RequestMapping("/workbench/activity/editActivityById.do")
+	public @ResponseBody
+	Object editActivityById(Activity activity,HttpSession session) {
+		//封装参数
+		//获取当前时间
+		activity.setEditTime(DateUtils.formateDateTime(new Date()));
+		//获取session的id
+		User user = (User) session.getAttribute(Contants.SESSION_USER);
+		activity.setEditBy(user.getId());
+		//调用Service
+		ReturnObject returnObject = new ReturnObject();
+		try {
+			int ret = activityService.editActivityById(activity);
+			if (ret>0){
+				returnObject.setCode(Contants.RETURN_OBJECT_CODE_SUCCESS);
+			}else {
+				returnObject.setCode(Contants.RETURN_OBJECT_CODE_FAIL);
+				returnObject.setMessage("系统繁忙，稍后再试");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			returnObject.setCode(Contants.RETURN_OBJECT_CODE_FAIL);
+			returnObject.setMessage("系统繁忙，稍后再试");
+		}
+		return returnObject;
+
+
+	}
 }
