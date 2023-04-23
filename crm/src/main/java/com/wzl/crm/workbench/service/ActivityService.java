@@ -38,4 +38,22 @@ public interface ActivityService {
 	 * 根据id修改市场活动
 	 */
 	int editActivityById(Activity activity);
+
+	/**
+	 * 批量导出
+	 */
+	List<Activity> queryAllActivities();
+	/**
+	 * 选择导出
+	 */
+	List<Activity> queryActivitiesByids(String[] id);
+	/**
+	 * 批量导入
+	 */
+	int saveCreateActivityByList(List<Activity>activityList);
+
+	/**
+	 * 点击名称，查看市场详细
+	 */
+	Activity queryActivityForDetail(String id);
 }

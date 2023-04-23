@@ -285,6 +285,72 @@
                 });
             });
 
+            // 下载:全选
+            $("#exportActivityAllBtn").click(function () {
+                window.location.href = "workbench/activity/exportAllActivities.do";
+            });
+
+            //下载：选中
+            $("#exportActivityXzBtn").click(function () {
+                var eventIds = $("#tBody input[type='checkbox']:checked");
+                var ids = "?";
+                $.each(eventIds, function () {
+                    ids += "id=" + this.value + "&";
+                });
+                ids = ids.substr(0, ids.length - 1);
+                window.location.href = "workbench/activity/exportSelectActivities.do" + ids;
+            });
+
+            // 6 导入
+            $("#importOpenActivityBtn").click(function () {
+                // 6.1 点击导入弹出导入框
+                $("#importActivityModal").modal("show");
+                // 6.2 点击导入按钮
+                $("#importActivityBtn").click(function () {
+                    // 收集参数
+                    var activityFileName = $("#activityFile").val();
+                    // 截取文件类型
+                    var suffix = activityFileName.substr(activityFileName.lastIndexOf(".") + 1).toLocaleLowerCase();
+                    if (suffix != "xls") {
+                        alert("只支持xls文件");
+                        return;
+                    }
+                    // 获取文件--$("#activityFile").get(0)获取DOM对象，然后可以上传多个文件，选取第一个文件files[0]
+                    var activityFile = $("#activityFile").get(0).files[0];
+                    if (activityFile.size > 5 * 1024 * 1024) {
+                        alert("文件不能大于5MB");
+                        return;
+                    }
+                    // FormData是ajax提供的接口,可以模拟K-V对向后台提交参数;
+                    // FormData最大的优势是不但能提交文本数据，还能提交二进制数据
+                    var formData = new FormData();
+                    formData.append("activityFile", activityFile);
+                    // 发送请求
+                    $.ajax({
+                        url: 'workbench/activity/importActivities.do',
+                        data:formData,
+                        processData:false,// 不转换为字符串
+                        contentType:false,// 不编码
+                        type: 'post',
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.code == "1") {
+                                // 成功导入
+                                $("#importActivityModal").modal("hide");
+                                queryActivityByConditionForPage(1, $("#pagDiv").bs_pagination('getOption', 'rowsPerPage'));
+                                alert("成功导入" + data.retDate + "条数据");
+
+                            } else {
+                                alert(data.message);
+                                $("#importActivityModal").modal("show");
+                            }
+                        }
+                    });
+
+                });
+
+            });
+
 
         });
 
@@ -320,8 +386,8 @@
                     $.each(data.activityList, function (index, obj) {
                         // obj和this都是取出的数组元素,htmlStr进行字符串拼接
                         htmlStr += "<tr class=\"active\">";
-                        htmlStr += "<td><input type=\"checkbox\" style='width: 15px;height: 15px' value=\"" + obj.id + "\"/></td>";
-                        htmlStr += " <td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='detail.html';\">" + obj.name + "</a></td>";
+                        htmlStr += "<td><input type=\"checkbox\" style='width: 15px;height: 15px' value=\""+obj.id+"\"/></td>";
+                        htmlStr += " <td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='workbench/activity/ActivityDetail.do?id="+obj.id+"'\">" + obj.name + "</a></td>";
                         htmlStr += "<td>" + obj.owner + "</td>";
                         htmlStr += " <td>" + obj.startDate + "</td>";
                         htmlStr += " <td>" + obj.endDate + "</td>";
@@ -512,6 +578,8 @@
                 </div>
                 <div style="position: relative;top: 40px; left: 50px;">
                     <input type="file" id="activityFile">
+                    <br>
+                    <a href="file/activity.xls" download="activity-mode.xls" style="text-decoration:none;color: #2a6496" ><b>下载导入文件模板</b></a>
                 </div>
                 <div style="position: relative; width: 400px; height: 320px; left: 45% ; top: -40px;">
                     <h3>重要提示</h3>
@@ -594,14 +662,14 @@
                 </button>
             </div>
             <div class="btn-group" style="position: relative; top: 18%;">
-                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#importActivityModal">
+                <button id="importOpenActivityBtn" type="button" class="btn btn-default">
                     <span class="glyphicon glyphicon-import"></span> 上传列表数据（导入）
                 </button>
                 <button id="exportActivityAllBtn" type="button" class="btn btn-default"><span
-                        class="glyphicon glyphicon-export"></span> 下载列表数据（批量导出）
+                        class="glyphicon glyphicon-export"></span> 下载列表数据（全部）
                 </button>
                 <button id="exportActivityXzBtn" type="button" class="btn btn-default"><span
-                        class="glyphicon glyphicon-export"></span> 下载列表数据（选择导出）
+                        class="glyphicon glyphicon-export"></span> 下载列表数据（选中）
                 </button>
             </div>
             <div class="btn-group" style="position: relative; top: 18%;">
@@ -625,7 +693,7 @@
                 <%--                <tr class="active">--%>
                 <%--                    <td><input type="checkbox"/></td>--%>
                 <%--                    <td><a style="text-decoration: none; cursor: pointer;"--%>
-                <%--                           onclick="window.location.href='detail.html';">发传单</a></td>--%>
+                <%--                           onclick="window.location.href='detail.jsp';">发传单</a></td>--%>
                 <%--                    <td>zhangsan</td>--%>
                 <%--                    <td>2020-10-10</td>--%>
                 <%--                    <td>2020-10-20</td>--%>

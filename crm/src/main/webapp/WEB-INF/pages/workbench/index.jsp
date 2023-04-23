@@ -147,7 +147,7 @@
 <div id="top" style="height: 50px; background-color: #3C3C3C; width: 100%;">
     <div style="position: absolute; top: 5px; left: 0px; font-size: 30px; font-weight: 400; color: white; font-family: 'times new roman'">
         CRM &nbsp;<span style="font-size: 12px;">&copy;2022&nbsp;动力节点</span></div>
-    <div style="position: absolute; top: 15px; right: 15px;">
+    <div style="position: absolute; top: 15px; right: 47px;">
         <ul>
             <li class="dropdown user-dropdown">
                 <a href="javascript:void(0)" style="text-decoration: none; color: white;" class="dropdown-toggle"
@@ -185,7 +185,7 @@
                     class="glyphicon glyphicon-user"></span> 客户公海</a></li>
             <li class="liClass"><a href="workbench/activity/index.do" target="workareaFrame"><span
                     class="glyphicon glyphicon-play-circle"></span> 市场活动</a></li>
-            <li class="liClass"><a href="clue/index.html" target="workareaFrame"><span
+            <li class="liClass"><a href="workbench/clue/index.do" target="workareaFrame"><span
                     class="glyphicon glyphicon-search"></span> 线索（潜在客户）</a></li>
             <li class="liClass"><a href="customer/index.html" target="workareaFrame"><span
                     class="glyphicon glyphicon-user"></span> 客户</a></li>

@@ -11,5 +11,7 @@ public class Contants {
 	public static final String RETURN_OBJECT_CODE_FAIL = "0"; //失败
 	//保存当前用户的key
 	public static final String SESSION_USER = "sessionUser";
+	// 设置导出市场活动文件名（注意：只能为excel文件，加上拓展名：.xsl）
+	public static final String FILE_NAME_ACTIVITY = "activity.xls";
 
 }
