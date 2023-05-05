@@ -56,4 +56,18 @@ public interface ActivityService {
 	 * 点击名称，查看市场详细
 	 */
 	Activity queryActivityForDetail(String id);
+	/**
+	 * 关联市场活动1：根据线索id,查询该线索下关联的市场活动
+	 */
+	List<Activity> queryActivityForDetailByClueId(String clueId);
+	/**
+	 * 关联市场活动2：根据线索id,活动id输入的名称的 市场活动
+	 */
+	List<Activity> queryActivityForDetailByNameAndClueId(Map<String,Object> map);
+
+	/**
+	 * 线索转换：根据活动name和线索id，查询关联的市场
+	 */
+	List<Activity> queryActivityForConvertByNameClueId(Map<String,Object> map);
+
 }

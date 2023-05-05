@@ -62,7 +62,7 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
         <!--table表格每次只生成一个-->
-        <table tableName="tbl_clue_remark" domainObjectName="ClueRemark"
+        <table tableName="tbl_customer" domainObjectName="Customer"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false">

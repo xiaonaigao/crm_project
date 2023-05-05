@@ -140,29 +140,162 @@
                 var id = $("#edit-id").val();
                 var noteContent = $("#edit-noteContent").val();
                 // 表单验证
-                if (noteContent==""){
+                if (noteContent == "") {
                     alert("请输入修改的备注");
                     return;
                 }
                 $.ajax({
-                    url:'workbench/clue/editClueRemarkById.do',
-                    data:{id:id,noteContent:noteContent},
-                    type:'post',
-                    dataType:'json',
-                    success:function (data) {
-                        if (data.code=="1"){
+                    url: 'workbench/clue/editClueRemarkById.do',
+                    data: {id: id, noteContent: noteContent},
+                    type: 'post',
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.code == "1") {
                             // 成功
                             $("#div_" + id + " p").text(noteContent);
                             $("#div_" + id + " small").text("@${sessionScope.sessionUser.name}:" + data.retDate.editTime + "修改");
                             $("#editRemarkModal").modal("hide");
-                        }else{
+                        } else {
                             //失败
                             alert(data.message);
                         }
                     }
                 });
             });
+            /**
+             * 关联市场活动
+             */
+            // 1给绑定市场活动按钮添加单击事件
+            $("#boundActivityBtn").click(function () {
+                // 初始化
+                $("#searchActivityTxt").val(""); //清空搜索框
+                $("#tBody").html(""); // 清空之前显示的数据
+                $("#checkAll").prop("checked", false); // 全选取消
+                // 显示模态窗口
+                $("#boundModal").modal("show");
+            });
 
+            // 2搜索框添加单击事件,在键盘的键被按下的时候,接下来触发
+            $("#searchActivityTxt").keyup(function () {
+                // 获取参数
+                var clueId = '${clue.id}';
+                var activityName = $("#searchActivityTxt").val();
+                // 发送请求
+                $.ajax({
+                    url: 'workbench/clue/queryActivityForDetailByNameAndClueId.do',
+                    data: {clueId: clueId, activityName: activityName},
+                    type: 'post',
+                    dataType: 'json',
+                    success: function (data) {
+                        var htmlStr = "";
+                        $.each(data, function (index, obj) {
+                            htmlStr += "<tr>";
+                            htmlStr += "<td><input type=\"checkbox\" value=\"" + obj.id + "\"/></td>";
+                            htmlStr += "<td>" + obj.name + "</td>";
+                            htmlStr += "<td>" + obj.startDate + "</td>";
+                            htmlStr += "<td>" + obj.endDate + "</td>";
+                            htmlStr += "<td>" + obj.owner + "</td>";
+                            htmlStr += "</tr>";
+                        });
+                        $("#tBody").html(htmlStr);
+                    }
+                });
+            });
+
+            // 给全选按钮添加事件实现全选（全选按钮在线索数据被查出来之前已经生成了，所以直接给固有元素全选按钮添加事件即可）
+            $("#checkAll").click(function () {
+                // 如果全选按钮选中，则列表中所有按钮都选中（操作tBody下面的所有子标签input，设置为当前（this）全选按钮的状态）
+                $("#tBody input[type='checkbox']").prop("checked", this.checked);
+            });
+
+            // 当线索标签不是全选时取消全选按钮
+            $("#tBody").on("click", "input[type='checkbox']", function () {
+                // 设置全选标签状态，如果当前所有标签数和选中标签数相等，则全选，否则不全选
+                $("#checkAll").prop("checked",
+                    $("#tBody input[type='checkbox']").size() == $("#tBody input[type='checkbox']:checked").size());
+            });
+
+            // 3 点击关联
+            $("#saveBoundBtn").click(function () {
+                // 收集参数
+                // 获取所有选中的checkbox
+                var checkids = $("#tBody input[type='checkbox']:checked");
+                var clueId = '${clue.id}';
+                // 表单验证
+                if (checkids.size() == 0) {
+                    alert("输入要关联的市场活动");
+                    return;
+                }
+                // 拼接参数
+                var ids = "";
+                $.each(checkids, function () {// activityId=xxxx&activityId=xxxx&....&activityId=xxxx&
+                    ids += "activityId=" + this.value + "&";
+                });
+                ids += "clueId=" + clueId;
+                // 发送请求
+                $.ajax({
+                    url: 'workbench/clue/saveBound.do',
+                    data: ids,
+                    type: 'post',
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.code == "1") {
+                            // 成功
+                            $("#boundModal").modal("hide");
+                            var htmlStr = "";
+                            $.each(data.retDate, function (index, obj) {
+                                htmlStr += "<tr id=\"tr_" + obj.id + "\">";
+                                htmlStr += "<td>" + obj.name + "</td>";
+                                htmlStr += "<td>" + obj.startDate + "</td>";
+                                htmlStr += "<td>" + obj.endDate + "</td>";
+                                htmlStr += "<td>" + obj.owner + "</td>";
+                                htmlStr += "<td><a href=\"javascript:void(0);\" activityId=\"" + obj.id + "\"  style=\"text-decoration: none;\"><span class=\"glyphicon glyphicon-remove\"></span>解除关联</a></td>";
+                                htmlStr += "</tr>";
+                            });
+                            $("#relationTBody").append(htmlStr);
+                        } else {
+                            alert(data.message);
+                        }
+                    }
+                });
+
+            });
+
+            /**
+             * 解除关联
+             */
+            $("#relationTBody").on("click", "a", function () {
+                // 收集参数
+                var activityId = $(this).attr("activityId"); // 市场活动id
+                var clueId = "${clue.id}"; // 线索id
+                // 确定
+                if (!window.confirm("确定解除绑定吗？")){
+                    return;
+                }
+                // 发送请求
+                $.ajax({
+                    url:'workbench/clue/deleteBound.do',
+                    data:{activityId:activityId,clueId:clueId},
+                    type:'post',
+                    dataType:'json',
+                    success:function (data) {
+                        if (data.code=="1"){
+                            //成功
+                            $("#tr_"+activityId).remove();
+                        }else{
+                            alert(data.message);
+                        }
+                    }
+
+                });
+            });
+
+            /**
+             * 线索转换
+             */
+            $("#convertClueBtn").click(function () {
+                window.location.href="workbench/clue/toConvert.do?id=${clue.id}";
+            });
         });
 
     </script>
@@ -171,7 +304,7 @@
 <body>
 
 <!-- 关联市场活动的模态窗口 -->
-<div class="modal fade" id="bundModal" role="dialog">
+<div class="modal fade" id="boundModal" role="dialog">
     <div class="modal-dialog" role="document" style="width: 80%;">
         <div class="modal-content">
             <div class="modal-header">
@@ -184,7 +317,7 @@
                 <div class="btn-group" style="position: relative; top: 18%; left: 8px;">
                     <form class="form-inline" role="form">
                         <div class="form-group has-feedback">
-                            <input type="text" class="form-control" style="width: 300px;"
+                            <input type="text" id="searchActivityTxt" class="form-control" style="width: 300px;"
                                    placeholder="请输入市场活动名称，支持模糊查询">
                             <span class="glyphicon glyphicon-search form-control-feedback"></span>
                         </div>
@@ -193,7 +326,7 @@
                 <table id="activityTable" class="table table-hover" style="width: 900px; position: relative;top: 10px;">
                     <thead>
                     <tr style="color: #B3B3B3;">
-                        <td><input type="checkbox"/></td>
+                        <td><input type="checkbox" id="checkAll"/></td>
                         <td>名称</td>
                         <td>开始日期</td>
                         <td>结束日期</td>
@@ -201,27 +334,14 @@
                         <td></td>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr>
-                        <td><input type="checkbox"/></td>
-                        <td>发传单</td>
-                        <td>2020-10-10</td>
-                        <td>2020-10-20</td>
-                        <td>zhangsan</td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox"/></td>
-                        <td>发传单</td>
-                        <td>2020-10-10</td>
-                        <td>2020-10-20</td>
-                        <td>zhangsan</td>
-                    </tr>
+                    <tbody id="tBody">
+
                     </tbody>
                 </table>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal">关联</button>
+                <button type="button" class="btn btn-primary" id="saveBoundBtn">关联</button>
             </div>
         </div>
     </div>
@@ -268,7 +388,7 @@
         <h3>${clue.fullname} <small>${clue.company}</small></h3>
     </div>
     <div style="position: relative; height: 50px; width: 500px;  top: -72px; left: 700px;">
-        <button type="button" class="btn btn-default" onclick="window.location.href='convert.html';"><span
+        <button type="button" class="btn btn-default" id="convertClueBtn" ;><span
                 class="glyphicon glyphicon-retweet"></span> 转换
         </button>
 
@@ -306,14 +426,6 @@
         <div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px;"></div>
         <div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px; left: 450px;"></div>
     </div>
-    <%--		<div style="position: relative; left: 40px; height: 30px; top: 30px;">--%>
-    <%--			<div style="width: 300px; color: gray;">公司网站</div>--%>
-    <%--			<div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>${clue.website}</b></div>--%>
-    <%--			<div style="width: 300px;position: relative; left: 450px; top: -40px; color: gray;">手机</div>--%>
-    <%--			<div style="width: 300px;position: relative; left: 650px; top: -60px;"><b>${clue.mphone}</b></div>--%>
-    <%--			<div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px;"></div>--%>
-    <%--			<div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px; left: 450px;"></div>--%>
-    <%--		</div>--%>
     <div style="position: relative; left: 40px; height: 30px; top: 40px;">
         <div style="width: 300px; color: gray;">线索状态</div>
         <div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>${clue.state}</b></div>
@@ -422,29 +534,24 @@
                     <td></td>
                 </tr>
                 </thead>
-                <tbody>
-                <tr>
-                    <td>发传单</td>
-                    <td>2020-10-10</td>
-                    <td>2020-10-20</td>
-                    <td>zhangsan</td>
-                    <td><a href="javascript:void(0);" style="text-decoration: none;"><span
-                            class="glyphicon glyphicon-remove"></span>解除关联</a></td>
-                </tr>
-                <tr>
-                    <td>发传单</td>
-                    <td>2020-10-10</td>
-                    <td>2020-10-20</td>
-                    <td>zhangsan</td>
-                    <td><a href="javascript:void(0);" style="text-decoration: none;"><span
-                            class="glyphicon glyphicon-remove"></span>解除关联</a></td>
-                </tr>
+                <tbody id="relationTBody">
+                <c:forEach items="${activityList}" var="activity">
+                    <tr id="tr_${activity.id}">
+                        <td >${activity.name}</td>
+                        <td>${activity.startDate}</td>
+                        <td>${activity.endDate}</td>
+                        <td>${activity.owner}</td>
+                        <td><a href="javascript:void(0);" activityId="${activity.id}"
+                               style="text-decoration: none;"><span
+                                class="glyphicon glyphicon-remove"></span>解除关联</a></td>
+                    </tr>
+                </c:forEach>
                 </tbody>
             </table>
         </div>
 
         <div>
-            <a href="javascript:void(0);" data-toggle="modal" data-target="#bundModal"
+            <a href="javascript:void(0);" id="boundActivityBtn"
                style="text-decoration: none;"><span class="glyphicon glyphicon-plus"></span>关联市场活动</a>
         </div>
     </div>

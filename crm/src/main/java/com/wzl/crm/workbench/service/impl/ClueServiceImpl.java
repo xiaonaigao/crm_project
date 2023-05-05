@@ -1,6 +1,8 @@
 package com.wzl.crm.workbench.service.impl;
 
+import com.wzl.crm.workbench.domain.Activity;
 import com.wzl.crm.workbench.domain.Clue;
+import com.wzl.crm.workbench.mapper.ActivityMapper;
 import com.wzl.crm.workbench.mapper.ClueMapper;
 import com.wzl.crm.workbench.service.ClueService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import java.util.Map;
 public class ClueServiceImpl implements ClueService {
 	@Autowired
 	private ClueMapper clueMapper;
+	@Autowired
+	private ActivityMapper activityMapper;
 	@Override
 	public int saveCreateClue(Clue clue) {
 		return clueMapper.insertClue(clue);
@@ -51,6 +55,16 @@ public class ClueServiceImpl implements ClueService {
 	@Override
 	public Clue queryClueForDetailById(String id) {
 		return clueMapper.selectClueForDetailById(id);
+	}
+
+	@Override
+	public int saveConvertClue(Map<String, Object> map) {
+		// 获取参数
+		String id = (String) map.get("id");
+		// 根据线索id
+		Activity activity = activityMapper.selectActivityById(id);
+
+		return 0;
 	}
 
 }

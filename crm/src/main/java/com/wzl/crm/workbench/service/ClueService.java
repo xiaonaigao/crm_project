@@ -40,4 +40,9 @@ public interface ClueService {
 	 * 线索详情1：线索明细
 	 */
 	Clue queryClueForDetailById(String id);
+
+	/**
+	 * 线索转换
+	 */
+	int saveConvertClue(Map<String,Object>map);
 }
