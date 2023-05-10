@@ -44,5 +44,5 @@ public interface ClueService {
 	/**
 	 * 线索转换
 	 */
-	int saveConvertClue(Map<String,Object>map);
+	void saveConvertClue(Map<String,Object>map);
 }

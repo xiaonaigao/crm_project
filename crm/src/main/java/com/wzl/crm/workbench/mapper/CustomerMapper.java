@@ -50,4 +50,9 @@ public interface CustomerMapper {
      * @mbggenerated Thu Apr 27 21:59:13 CST 2023
      */
     int updateByPrimaryKey(Customer record);
+
+    /**
+     * 线索转换1：增加客户信息
+     */
+    int insertCustomer(Customer customer);
 }

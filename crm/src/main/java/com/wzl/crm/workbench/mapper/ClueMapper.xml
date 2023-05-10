@@ -328,25 +328,25 @@
         left join tbl_user u3 on cl.edit_by=u3.id
         <where>
             <if test="fullname!=null and fullname!=''">
-                and cl.fullname like '%' #{fullname} '%'
+                and cl.fullname like "%"#{fullname}"%"
             </if>
             <if test="company!=null and company!=''">
-                and cl.company like '%' #{company} '%'
+                and cl.company like "%"#{company}"%"
             </if>
             <if test="phone!=null and phone!=''">
-                and cl.phone like '%' #{phone} '%'
+                and cl.phone like "%"#{phone}"%"
             </if>
             <if test="source!=null and source!=''">
-                and dicv3.value like '%' #{source} '%'
+                and dicv3.value like "%"#{source}"%"
             </if>
             <if test="owner!=null and owner!=''">
-                and u1.name like '%' #{owner} '%'
+                and u1.name like "%"#{owner}"%"
             </if>
             <if test="mphone!=null and mphone!=''">
-                and cl.mphone like '%' #{mphone} '%'
+                and cl.mphone like "%"#{mphone}"%"
             </if>
             <if test="state!=null and state!=''">
-                and dicv2.value like '%' #{state} '%'
+                and dicv2.value like "%"#{state}"%"
             </if>
         </where>
         order by cl.create_time desc
@@ -364,25 +364,25 @@
         left join tbl_user u3 on cl.edit_by=u3.id
         <where>
             <if test="fullname!=null and fullname!=''">
-                and cl.fullname like '%' #{fullname} '%'
+                and cl.fullname like "%"#{fullname}"%"
             </if>
             <if test="company!=null and company!=''">
-                and cl.company like '%' #{company} '%'
+                and cl.company like "%"#{company}"%"
             </if>
             <if test="phone!=null and phone!=''">
-                and cl.phone like '%' #{phone} '%'
+                and cl.phone like "%"#{phone}"%"
             </if>
             <if test="source!=null and source!=''">
-                and dicv3.value like '%' #{source} '%'
+                and dicv3.value like "%"#{source}"%"
             </if>
             <if test="owner!=null and owner!=''">
-                and u1.name like '%' #{owner} '%'
+                and u1.name like "%"#{owner}"%"
             </if>
             <if test="mphone!=null and mphone!=''">
-                and cl.mphone like '%' #{mphone} '%'
+                and cl.mphone like "%"#{mphone}"%"
             </if>
             <if test="state!=null and state!=''">
-                and dicv2.value like '%' #{state} '%'
+                and dicv2.value like "%"#{state}"%"
             </if>
         </where>
     </select>

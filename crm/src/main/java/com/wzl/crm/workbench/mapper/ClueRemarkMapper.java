@@ -71,4 +71,14 @@ public interface ClueRemarkMapper {
      * 修改线索备注
      */
     int  updateClueRemarkById(ClueRemark clueRemark);
+
+    /**
+     * 根据线索id 查询备注2
+     */
+    List<ClueRemark> selectInitialClueRemarkByClueId(String clueId);
+
+    /**
+     *根据线索id删除
+     */
+    int deleteClueRemarkByClueId(String[] clueIds);
 }

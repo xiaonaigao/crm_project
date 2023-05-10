@@ -23,7 +23,7 @@
 
         $(function () {
             // 加载首页线索
-            queryClueByConditionForPage(1,10);
+            queryClueByConditionForPage(1, 10);
             // 创建线索1
             $("#createClueBtn").click(function () {
                 // 重置form
@@ -118,7 +118,7 @@
                             // 关闭模态
                             $("#createClueModal").modal("hide");
                             // 首页
-                            queryClueByConditionForPage(1,10);
+                            queryClueByConditionForPage(1, 10);
                         } else {
                             alert(code.message);
                         }
@@ -139,7 +139,7 @@
             });
             // 查询：条件查询
             $("#queryBtn").click(function () {
-                queryClueByConditionForPage(1,10);
+                queryClueByConditionForPage(1, 10);
             });
             //删除： 删除按钮
             $("#deleteClueBtn").click(function () {
@@ -173,7 +173,7 @@
                             if (data.code == '1') {
                                 //删除成功
                                 //刷新
-                                queryClueByConditionForPage(1,10);
+                                queryClueByConditionForPage(1, 10);
                             } else {
                                 alert(data.message);
                             }
@@ -209,18 +209,18 @@
                             $("#edit-id").val(data.id);
                             $("#edit-surname").val(data.fullname);
                             $("#edit-call").val(data.appellation);
-                           $("#edit-clueOwner").val(data.owner);
-                           $("#edit-company").val(data.company);
-                          $("#edit-job").val(data.job);
+                            $("#edit-clueOwner").val(data.owner);
+                            $("#edit-company").val(data.company);
+                            $("#edit-job").val(data.job);
                             $("#edit-email").val(data.email);
                             $("#edit-phone").val(data.phone);
                             $("#edit-website").val(data.website);
-                             $("#edit-mphone").val(data.mphone);
-                             $("#edit-status").val(data.state);
+                            $("#edit-mphone").val(data.mphone);
+                            $("#edit-status").val(data.state);
                             $("#edit-source").val(data.source);
-                           $("#edit-describe").val(data.description);
+                            $("#edit-describe").val(data.description);
                             $("#edit-contactSummary").val(data.contactSummary);
-                           $("#edit-nextContactTime").val(data.nextContactTime);
+                            $("#edit-nextContactTime").val(data.nextContactTime);
                             $("#edit-address").val(data.address);
                             // 弹出创建市场模态窗口
                             $("#editClueModal").modal("show");
@@ -297,7 +297,7 @@
                 $.ajax({
                     url: 'workbench/clue/updateClue.do',
                     data: {
-                        id:id,
+                        id: id,
                         fullname: fullname,
                         appellation: appellation,
                         owner: owner,
@@ -331,7 +331,6 @@
             });
 
 
-
         });
 
         // 查询线索
@@ -360,20 +359,20 @@
                 },
                 type: 'post',
                 dataType: 'json',
-                success:function (data) {
+                success: function (data) {
                     var htmlStr = "";
                     $.each(data.clueList, function (index, obj) {
                         // obj和this都是取出的数组元素,htmlStr进行字符串拼接
-                        htmlStr+="<tr class=\"active\">";
-                        htmlStr+="<td><input type=\"checkbox\" style='width: 15px;height: 15px' value=\""+obj.id+"\"/></td>";
-                        htmlStr+="<td><a style=\"text-decoration: none; cursor: pointer;\"onclick=\"window.location.href='workbench/clue/selectClueForDetailById.do?id="+obj.id+"';\">"+obj.fullname+"</a></td>";
-                        htmlStr+="<td>"+obj.company+"</td>";
-                        htmlStr+="<td>"+obj.phone+"</td>";
-                        htmlStr+="<td>"+obj.mphone+"</td>";
-                        htmlStr+="<td>"+obj.source+"</td>";
-                        htmlStr+=" <td>"+obj.owner+"</td>";
-                        htmlStr+="<td>"+obj.state+"</td>";
-                        htmlStr+=" </tr>";
+                        htmlStr += "<tr class=\"active\">";
+                        htmlStr += "<td><input type=\"checkbox\" style='width: 15px;height: 15px' value=\"" + obj.id + "\"/></td>";
+                        htmlStr += "<td><a style=\"text-decoration: none; cursor: pointer;\"onclick=\"window.location.href='workbench/clue/selectClueForDetailById.do?id=" + obj.id + "';\">" + obj.fullname + "</a></td>";
+                        htmlStr += "<td>" + obj.company + "</td>";
+                        htmlStr += "<td>" + obj.phone + "</td>";
+                        htmlStr += "<td>" + obj.mphone + "</td>";
+                        htmlStr += "<td>" + obj.source + "</td>";
+                        htmlStr += " <td>" + obj.owner + "</td>";
+                        htmlStr += "<td>" + obj.state + "</td>";
+                        htmlStr += " </tr>";
                     });
                     // 把拼接好的表格字符串 插入到 显示的<tbody>
                     // text()显示文本信息不能有标签，html()可以有标签
@@ -402,7 +401,6 @@
                 }
             });
         }
-
 
 
     </script>
@@ -743,7 +741,7 @@
                         <select class="form-control" id="query-source">
                             <option></option>
                             <c:forEach items="${sourceList}" var="source">
-                                <option value="${source.id}">${source.value}</option>
+                                <option >${source.value}</option>
                             </c:forEach>
                         </select>
                     </div>
@@ -757,7 +755,7 @@
                         <select class="form-control" id="query-owner">
                             <option></option>
                             <c:forEach items="${userList}" var="user">
-                                <option value="${user.id}">${user.name}</option>
+                                <option >${user.name}</option>
                             </c:forEach>
                         </select>
                     </div>
@@ -777,13 +775,13 @@
                         <select class="form-control" id="query-state">
                             <option></option>
                             <c:forEach items="${clueStateList}" var="clueState">
-                                <option value="${clueState.id}">${clueState.value}</option>
+                                <option >${clueState.value}</option>
                             </c:forEach>
                         </select>
                     </div>
                 </div>
 
-                <button type="button"  class="btn btn-default" id="queryBtn">查询</button>
+                <button type="button" class="btn btn-default" id="queryBtn">查询</button>
 
             </form>
         </div>
@@ -796,7 +794,9 @@
                 <button type="button" class="btn btn-default" id="updateClueBtn"><span
                         class="glyphicon glyphicon-pencil"></span> 修改
                 </button>
-                <button type="button" class="btn btn-danger" id="deleteClueBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+                <button type="button" class="btn btn-danger" id="deleteClueBtn"><span
+                        class="glyphicon glyphicon-minus"></span> 删除
+                </button>
             </div>
 
 
@@ -821,11 +821,12 @@
             </table>
             <%--下一页上一页--%>
             <div id="pagDiv">
+            </div>
+
+
         </div>
 
-
     </div>
-
 </div>
 </body>
 </html>

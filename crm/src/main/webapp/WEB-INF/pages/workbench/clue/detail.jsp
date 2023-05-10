@@ -172,6 +172,32 @@
                 $("#tBody").html(""); // 清空之前显示的数据
                 $("#checkAll").prop("checked", false); // 全选取消
                 // 显示模态窗口
+
+                // 获取参数
+                var clueId = '${clue.id}';
+                var activityName = "";
+                // 发送请求
+                $.ajax({
+                    url: 'workbench/clue/queryActivityForDetailByNameAndClueId.do',
+                    data: {clueId: clueId, activityName: activityName},
+                    type: 'post',
+                    dataType: 'json',
+                    success: function (data) {
+                        var htmlStr = "";
+                        $.each(data, function (index, obj) {
+                            htmlStr += "<tr>";
+                            htmlStr += "<td><input type=\"checkbox\" value=\"" + obj.id + "\"/></td>";
+                            htmlStr += "<td>" + obj.name + "</td>";
+                            htmlStr += "<td>" + obj.startDate + "</td>";
+                            htmlStr += "<td>" + obj.endDate + "</td>";
+                            htmlStr += "<td>" + obj.owner + "</td>";
+                            htmlStr += "</tr>";
+                        });
+                        $("#tBody").html(htmlStr);
+                    }
+                });
+
+
                 $("#boundModal").modal("show");
             });
 

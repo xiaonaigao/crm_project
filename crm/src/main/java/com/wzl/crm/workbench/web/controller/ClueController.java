@@ -14,6 +14,10 @@ import com.wzl.crm.workbench.service.ClueRemarkService;
 import com.wzl.crm.workbench.service.ClueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -300,6 +304,35 @@ public class ClueController {
 		map.put("clueId",clueId);
 		List<Activity> activityList = activityService.queryActivityForConvertByNameClueId(map);
 		return activityList;
+	}
+
+	/**
+	 * 线索转换3：转换按钮
+	 */
+	@RequestMapping("/workbench/clue/saveConvertClue.do")
+	public @ResponseBody Object saveConvertClue(String clueId,String money,String name,String expectedDate,String stage,String activityId,String isCreateTran,HttpSession session){
+		// 收集参数
+		Map<String,Object> map = new HashMap<>();
+		map.put("clueId",clueId);
+		map.put("money",money);
+		map.put("name",name);
+		map.put("expectedDate",expectedDate);
+		map.put("stage",stage);
+		map.put("activityId",activityId);
+		map.put("isCreateTran",isCreateTran);
+		map.put(Contants.SESSION_USER,session.getAttribute(Contants.SESSION_USER));
+		ReturnObject returnObject = new ReturnObject();
+		// 调用service
+		try {
+			clueService.saveConvertClue(map);
+			returnObject.setCode(Contants.RETURN_OBJECT_CODE_SUCCESS);
+		} catch (Exception e) {
+			e.printStackTrace();
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			returnObject.setCode(Contants.RETURN_OBJECT_CODE_FAIL);
+
+		}
+		return returnObject;
 	}
 
 

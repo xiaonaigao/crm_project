@@ -190,16 +190,33 @@
     </insert>
     <!--int deleteClueRemarkById(String id);-->
     <delete id="deleteClueRemarkById">
-        delete from tbl_clue_remark
+        delete
+        from tbl_clue_remark
         where id = #{id}
     </delete>
+
     <!--    int  updateClueRemarkById(ClueRemark clueRemark);-->
     <update id="updateClueRemarkById">
         update tbl_clue_remark
         set note_content = #{noteContent,jdbcType=VARCHAR},
-            edit_by = #{editBy,jdbcType=VARCHAR},
-            edit_time = #{editTime,jdbcType=CHAR},
-            edit_flag = #{editFlag,jdbcType=CHAR}
-        where id= #{id,jdbcType=CHAR}
+            edit_by      = #{editBy,jdbcType=VARCHAR},
+            edit_time    = #{editTime,jdbcType=CHAR},
+            edit_flag    = #{editFlag,jdbcType=CHAR}
+        where id = #{id,jdbcType=CHAR}
     </update>
+    <!--  List<ClueRemark> selectInitialClueRemarkByClueId(String clueId);-->
+    <select id="selectInitialClueRemarkByClueId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tbl_clue_remark
+        where clue_id=#{clueId}
+    </select>
+    <!--   int deleteClueRemarkByClueId(String clueIds);-->
+    <delete id="deleteClueRemarkByClueId">
+        delete from tbl_clue_remark
+        where clue_id in
+        <foreach collection="array" item="id" separator="," open="(" close=")">
+            #{id, jdbcType=VARCHAR}
+        </foreach>
+    </delete>
 </mapper>

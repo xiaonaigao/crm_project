@@ -47,8 +47,35 @@
 				$("#searchActivityTxt").val("");
 				// 清空搜索列表
 				$("#tBody").html("");
+
+				// 加载参数
+				var clueId = '${clue.id}';
+				var activityName ="";
+				// 发送请求
+				$.ajax({
+					url: 'workbench/clue/convertSearch.do',
+					data: {clueId: clueId, activityName: activityName},
+					type: 'post',
+					dataType: 'json',
+					success: function (data) {
+						var htmlStr = "";
+						$.each(data, function (index, obj) {
+							htmlStr += "<tr>";
+							htmlStr += "<td><input type=\"radio\" value=\"" + obj.id + "\" activityName=\""+obj.name+"\" name=\"activity\"//></td>";
+							htmlStr += "<td>" + obj.name + "</td>";
+							htmlStr += "<td>" + obj.startDate + "</td>";
+							htmlStr += "<td>" + obj.endDate + "</td>";
+							htmlStr += "<td>" + obj.owner + "</td>";
+							htmlStr += "</tr>";
+						});
+						$("#tBody").html(htmlStr);
+					}
+				});
+
 				// 弹出市场活动页面
 				$("#searchActivityModal").modal("show");
+
+
 			});
 			// 文本框搜索
 			$("#searchActivityTxt").keyup(function () {
@@ -87,6 +114,72 @@
 				$("#activityName").val(activityName);
 				// 关闭搜索市场活动的模态窗口
 				$("#searchActivityModal").modal("hide");
+			});
+			
+			// 转换按钮
+			$("#saveConvertClueBtn").click(function () {
+				//收集参数
+				var clueId = '${clue.id}';
+				var money = $.trim($("#amountOfMoney").val());
+				var name = $.trim($("#tradeName").val());
+				var expectedDate = $.trim($("#expectedClosingDate").val());
+				var stage = $("#stage").val();
+				var activityId = $("#activityId").val();
+				var isCreateTran = $("#isCreateTransaction").prop("checked");
+				// 表单验证
+				if (isCreateTran == true) {
+					if (money == "") {
+						alert("金额不能为空");
+						return;
+					}
+					if (name == "") {
+						alert("交易名称不能为空");
+						return;
+					}
+					if (expectedDate == "") {
+						alert("预计成交日期不能为空");
+						return;
+					}
+					if (stage == "") {
+						alert("阶段不能为空");
+						return;
+					}
+					if (activityId == "") {
+						alert("市场活动源不能为空");
+						return;
+					}
+					// 正则表达式验证成本：金额只能为非负整数
+					var regExp = /^(([1-9]\d*)|0)$/;
+					if (!regExp.test(money)) {
+						alert("金额只能为非负整数");
+						return;
+					}
+				}
+				// 发送请求
+				$.ajax({
+					url:'workbench/clue/saveConvertClue.do',
+					data:{
+						clueId:clueId,
+						money:money,
+						name:name,
+						expectedDate:expectedDate,
+						stage:stage,
+						activityId:activityId,
+						isCreateTran:isCreateTran
+					},
+					type:'post',
+					dataType: 'json',
+					success:function (data) {
+						if(data.code == "1") {
+							// 跳转到线索主页面
+							window.location.href = "workbench/clue/index.do";
+						} else {
+							// 提示信息
+							alert(data.message);
+						}
+					}
+				});
+
 			});
 
 		});
