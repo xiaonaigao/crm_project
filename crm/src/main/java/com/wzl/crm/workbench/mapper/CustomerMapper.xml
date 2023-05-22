@@ -237,4 +237,15 @@
                 #{editBy,jdbcType=VARCHAR}, #{editTime,jdbcType=CHAR}, #{contactSummary,jdbcType=VARCHAR},
                 #{nextContactTime,jdbcType=CHAR}, #{description,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR})
     </insert>
+    <!-- Customer selectCustomerForName(String customerName);-->
+    <select id="selectCustomerForNameToCustomerId" resultType="java.lang.String">
+        select id
+        from tbl_customer
+        where name = #{customerName}
+    </select>
+    <select id="selectCustomerForNameListlByName" resultType="string">
+        select name
+        from tbl_customer
+        where name like "%"#{customerName}"%"
+    </select>
 </mapper>

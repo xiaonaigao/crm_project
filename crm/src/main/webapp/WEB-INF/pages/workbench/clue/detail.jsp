@@ -72,6 +72,34 @@
                     type: 'post',
                     dataType: 'json',
                     success: function (data) {
+                        if (data.code == "1"){
+                            var htmlStr="";
+                            htmlStr += "<div id=\"div_" + data.retDate.id + "\" class=\"remarkDiv\" style=\"height: 60px;\">";
+                            htmlStr += "<img title=\"${sessionUser.name}\" src=\"image/user-thumbnail.png\" style=\"width: 35px; height:35px;\">";
+                            htmlStr += "<div style=\"position: relative; top: -40px; left: 40px;width: 870px; \">";
+                            htmlStr += "<small style=\"color: gray;\">@${sessionUser.name}:" + data.retDate.createTime + "创建</small>";
+                            htmlStr += "<p>" + data.retDate.noteContent + "</p>";
+                            htmlStr += "<div style=\"position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;\">";
+                            htmlStr += "	<a class=\"myHref\" name=\"editA\" remarkId=\"" + data.retDate.id + "\" href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-edit\" style=\"font-size: 20px; color: #E6E6E6;\"></span></a>";
+                            htmlStr += "&nbsp;&nbsp;&nbsp;&nbsp;";
+                            htmlStr += "<a class=\"myHref\" name=\"deleteA\" remarkId=\"" + data.retDate.id + "\" href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-remove\" style=\"font-size: 20px; color: #E6E6E6;\"></span></a>";
+                            htmlStr += "</div>";
+                            htmlStr += "</div>";
+                            htmlStr += "</div>";
+                            $("#remarkDiv").before(htmlStr);
+                        }else{
+                            alert(data.message);
+                        }
+                    }
+                })
+
+                $.ajax({
+                    url: 'workbench/clue/saveCreateClueRemark.do',
+                    data: {clueId: clueId, noteContent: noteContent},
+                    type: 'post',
+                    dataType: 'json',
+                    success: function (data) {
+                        alert("xxx");
                         if (data.code == "1") {
                             // 清空
                             $("#remark").val("");
@@ -388,7 +416,7 @@
             <div class="modal-body">
                 <form class="form-horizontal" role="form">
                     <div class="form-group">
-                        <label for="edit-describe" class="col-sm-2 control-label">内容</label>
+                        <label for="edit-noteContent" class="col-sm-2 control-label">内容</label>
                         <div class="col-sm-10" style="width: 81%;">
                             <textarea class="form-control" rows="3" id="edit-noteContent"></textarea>
                         </div>

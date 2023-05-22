@@ -7,7 +7,10 @@ import com.wzl.crm.settings.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author wang
@@ -21,4 +24,11 @@ public class DicValueServiceImpl implements DicValueService {
 	public List<DicValue> queryDicValueByTypeCode(String typeCode) {
 		return dicValueMapper.selectDicValueByTypeCode(typeCode);
 	}
+
+	@Override
+	public int queryDicToOrderNo(Map<String,Object> map) {
+		return dicValueMapper.selectDicToOrderNo(map);
+	}
+
+
 }

@@ -1,5 +1,6 @@
 package com.wzl.crm.workbench.mapper;
 
+import com.wzl.crm.workbench.domain.FunnelVO;
 import com.wzl.crm.workbench.domain.Tran;
 
 import java.util.List;
@@ -66,4 +67,32 @@ public interface TranMapper {
      * 交易的数量
      */
     int selectAllTranCount(Map<String,Object> map);
+    /**
+     * 插入交易
+     */
+    int insertCreateTran(Tran tran);
+    /**
+     * 根据ids删除交易
+     */
+    int deleteCreateTran(String[] tranIds);
+
+    /**
+     * 根据id查询交易
+     */
+    Tran selectTranDetailFortranId(String tranId);
+
+    /**
+     * 根据id更新
+     */
+    int updateTranDetailFortranId(Tran tran);
+    /**
+     * 根据id查询详细信息
+     */
+    Tran selectTranFortranId(String tranId);
+
+    /**
+     * 交易图表信息
+     * @return
+     */
+	List<FunnelVO> selectCountOfTranGroupByStage();
 }

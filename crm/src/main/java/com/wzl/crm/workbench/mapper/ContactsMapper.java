@@ -1,6 +1,9 @@
 package com.wzl.crm.workbench.mapper;
 
 import com.wzl.crm.workbench.domain.Contacts;
+import com.wzl.crm.workbench.domain.FunnelVO;
+
+import java.util.List;
 
 public interface ContactsMapper {
     /**
@@ -52,7 +55,18 @@ public interface ContactsMapper {
     int updateByPrimaryKey(Contacts record);
 
     /**
-     * 线索转换：增加客户信息
+     * 线索转换：增加联系人信息
      */
     int insertContacts(Contacts contacts);
+    /**
+     * 联系人信息：通过用户名
+     */
+    List<Contacts> selectContactsForDetailByName(String fullname);
+
+    /**
+     * 客户图表
+     * @return
+     */
+
+	List<FunnelVO> selectCountOfCustomerAndContactsGroupByCustomer();
 }

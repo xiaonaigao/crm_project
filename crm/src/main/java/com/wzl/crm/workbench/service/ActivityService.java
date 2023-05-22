@@ -1,6 +1,7 @@
 package com.wzl.crm.workbench.service;
 
 import com.wzl.crm.workbench.domain.Activity;
+import com.wzl.crm.workbench.domain.FunnelVO;
 
 import java.util.List;
 import java.util.Map;
@@ -70,4 +71,15 @@ public interface ActivityService {
 	 */
 	List<Activity> queryActivityForConvertByNameClueId(Map<String,Object> map);
 
+	/**
+	 * 市场活动：市场活动名称查询
+	 */
+	List<Activity> queryActivityForDetailByName(String activityName);
+
+	/**
+	 * 市场活动图标统计
+	 * @return
+	 */
+
+	List<FunnelVO> queryCountOfActivityGroupByStage();
 }

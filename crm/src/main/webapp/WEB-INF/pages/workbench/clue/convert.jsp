@@ -1,4 +1,4 @@
-﻿﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page isELIgnored="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
@@ -104,7 +104,7 @@
 				});
 			});
 
-			// 给所有市场活动的单选按钮添加单击事件
+			// 选择市场活动
 			$("#tBody").on("click","input[type='radio']",function () {
 				// 获取市场活动的id和name
 				var id = this.value;

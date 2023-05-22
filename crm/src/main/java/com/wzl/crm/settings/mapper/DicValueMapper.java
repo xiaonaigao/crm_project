@@ -3,6 +3,7 @@ package com.wzl.crm.settings.mapper;
 import com.wzl.crm.settings.domain.DicValue;
 
 import java.util.List;
+import java.util.Map;
 
 public interface DicValueMapper {
     /**
@@ -57,4 +58,9 @@ public interface DicValueMapper {
      * 根据type-code查询字典
      */
     List<DicValue> selectDicValueByTypeCode(String typeCode);
+
+    /**
+     * 根据id查询所在的OrderNo
+     */
+    int selectDicToOrderNo(Map<String,Object> map);
 }

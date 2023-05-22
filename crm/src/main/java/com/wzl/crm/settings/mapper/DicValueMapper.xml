@@ -139,4 +139,10 @@
         where type_code=#{typeCode}
         order by order_no asc
     </select>
+    <!--    int selectDicToOrderNo(String typeCode, String dicValue);-->
+    <select id="selectDicToOrderNo" resultType="java.lang.Integer">
+        select order_no
+        from tbl_dic_value
+        where type_code=#{typeCode} and value=#{dicValue}
+    </select>
 </mapper>

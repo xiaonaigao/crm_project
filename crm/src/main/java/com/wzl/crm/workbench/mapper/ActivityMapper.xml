@@ -389,7 +389,21 @@
             select activity_id
             from tbl_clue_activity_relation
             where clue_id = #{clueId}
-        )
+            )
+    </select>
+    <!--   List<Activity> selectActivityForDetailByName(String activityName);-->
+    <select id="selectActivityForDetailByName" resultMap="BaseResultMap">
+        select a.id, a.name, a.start_date, a.end_date, u.name as owner
+        from tbl_activity a
+        join tbl_user u on u.id = a.owner
+        where a.name like "%"#{activityName}"%"
+        order by create_time desc
+    </select>
+    <select id="selectCountOfActivityGroupByStage" resultType="com.wzl.crm.workbench.domain.FunnelVO">
+        select count(*) as value,u.name as name
+        from tbl_activity a
+            join tbl_user u on a.owner=u.id
+        group by u.name
     </select>
 
 </mapper>

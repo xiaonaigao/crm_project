@@ -1,6 +1,7 @@
 package com.wzl.crm.workbench.mapper;
 
 import com.wzl.crm.workbench.domain.Activity;
+import com.wzl.crm.workbench.domain.FunnelVO;
 
 import java.util.List;
 import java.util.Map;
@@ -118,4 +119,14 @@ public interface ActivityMapper {
      */
     List<Activity> selectActivityForConvertByNameClueId(Map<String,Object> map);
 
+    /**
+     * 市场活动:根据名称查询
+     */
+    List<Activity> selectActivityForDetailByName(String activityName);
+
+    /**
+     * 市场活动图标
+     * @return
+     */
+	List<FunnelVO> selectCountOfActivityGroupByStage();
 }

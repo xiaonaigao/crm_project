@@ -1,6 +1,7 @@
 package com.wzl.crm.workbench.service.impl;
 
 import com.wzl.crm.workbench.domain.Activity;
+import com.wzl.crm.workbench.domain.FunnelVO;
 import com.wzl.crm.workbench.mapper.ActivityMapper;
 import com.wzl.crm.workbench.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,16 @@ public class ActivityServiceImpl implements ActivityService {
 	@Override
 	public List<Activity> queryActivityForConvertByNameClueId(Map<String, Object> map) {
 		return activityMapper.selectActivityForConvertByNameClueId(map);
+	}
+
+	@Override
+	public List<Activity> queryActivityForDetailByName(String activityName) {
+		return activityMapper.selectActivityForDetailByName(activityName);
+	}
+
+	@Override
+	public List<FunnelVO> queryCountOfActivityGroupByStage() {
+		return activityMapper.selectCountOfActivityGroupByStage();
 	}
 
 }

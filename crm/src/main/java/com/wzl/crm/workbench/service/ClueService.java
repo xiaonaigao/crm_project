@@ -1,6 +1,7 @@
 package com.wzl.crm.workbench.service;
 
 import com.wzl.crm.workbench.domain.Clue;
+import com.wzl.crm.workbench.domain.FunnelVO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,4 +46,10 @@ public interface ClueService {
 	 * 线索转换
 	 */
 	void saveConvertClue(Map<String,Object>map);
+	/**
+	 * 线索图表
+	 */
+	List<Integer> queryCountOfClueGroupByClueStage();
+	List<String>queryClueStageOfClueGroupByClueStage();
+
 }

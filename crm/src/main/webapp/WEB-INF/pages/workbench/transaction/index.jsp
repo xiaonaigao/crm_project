@@ -22,16 +22,101 @@
     <script type="text/javascript">
 
         $(function () {
-            // 加载首页数据
+            // 1加载首页数据
             loadAllTran(1, 10);
-            // 搜索按钮
+            // 2搜索按钮
             $("#searchTranBtn").click(function () {
                 loadAllTran(1, 10);
             });
+            // 3创建按钮
+            $("#createTranBtn").click(function () {
+                window.location.href='workbench/transaction/saveIndex.do';
+            });
+            
+            // 4删除按钮
+            $("#deleteTranBtn").click(function () {
+                // 收集参数checkbox
+                var ids = $("#tBody input[type='checkbox']:checked");
+                // 删除为空
+                if (ids.size()==0){
+                    alert("请选择删除的事件");
+                    return;
+                }
+                if (window.confirm("确定删除吗？")){
+                    // 点击确认
+                    // 遍历数据 this就是选择的对象 this.value就是值
+                    // 把tranids=xxx&tranIds=xxx
+                    var tranIds="";
+                    $.each(ids,function () {
+                        tranIds+="tranIds="+this.value+"&";
+                    });
+                    // 删除最后的&
+                    tranIds = tranIds.substr(0,tranIds.length-1);
+
+                    // 发送请求
+                    $.ajax({
+                        url:'workbench/transaction/deleteTran.do',
+                        data:tranIds,
+                        type:'post',
+                        dataType: 'json',
+                        success:function (data) {
+                            if (data.code=='1'){
+                                // 删除成功--当前页
+                                loadAllTran($("#pagDiv").bs_pagination('getOption', 'currentPage'),
+                                    $("#pagDiv").bs_pagination('getOption', 'rowsPerPage'));
+                            }else{
+                                alert(code.message);
+                            }
+                        }
+                    });
+                }
+            });
+
+            //4.全选： 按钮添加单击事件
+            $("#chckAll").click(function () {
+                //判断 如果全选按钮选中，列表都选中checkbox
+                // if(this.checked==true){
+                //     $("#tBody input[type='checkbox']").prop("checked",true); //获取表格列表下的checkbox
+                // }else{
+                //     $("#tBody input[type='checkbox']").prop("checked",false); //获取表格列表下的checkbox
+                // }
+                $("#tBody input[type='checkbox']").prop("checked", this.checked);
+            });
+
+            //4.全选：单个框全选后，全选框也选中
+            $("#tBody").on("click", "input[type='checkbox']", function () {
+                // 所有的checkbox全部选中，全选也选中
+                if ($("#tBody input[type='checkbox']").size() == $("#tBody input[type='checkbox']:checked").size()) {
+                    $("#chckAll").prop("checked", true);
+                } else {
+                    $("#chckAll").prop("checked", false);
+                }
+            });
+
+            // 5.修改
+            $("#editTranBtn").click(function () {
+                // 收集选择的checkBox
+                var checkedIds = $("#tBody input[type='checkbox']:checked");
+                if (checkedIds.size()==0){
+                    alert("请选择修改的交易");
+                    return;
+                }
+                // 选择一个交易
+                if (checkedIds.size()==1){
+                   var tranId = checkedIds[0].value;
+                   window.location.href='workbench/transaction/searchTranForId.do?tranId='+tranId;
+                }else{
+                    alert("只能修改1条交易");
+                    return;
+                }
+            });
+
+
+            
 
         });
 
-        // 加载线索明细
+        // 搜索交易--主页展示
         function loadAllTran(pageNo, pageSize) {
             // 收集查询参数
             var owner = $.trim($("#query-owner").val());
@@ -62,7 +147,7 @@
                     $.each(data.tranAllList, function (index, obj) {
                         htmlStr += "<tr>";
                         htmlStr += "<td><input type=\"checkbox\" style='width: 15px;height: 15px' value=\"" + obj.id + "\"/></td>";
-                        htmlStr += "<td><a style=\"text-decoration: none; cursor: pointer;\"onclick=\"window.location.href='';\">" + obj.name + "</a></td>";
+                        htmlStr += "<td><a style=\"text-decoration: none; cursor: pointer;\"onclick=\"window.location.href='workbench/transaction/queryTranFortranId.do?tranId="+obj.id+"';\">" + obj.name + "</a></td>";
                         htmlStr += "<td>" + obj.customerId + "</td>";
                         htmlStr += "<td>" + obj.stage + "</td>";
                         htmlStr += " <td>" + obj.type + "</td>";
@@ -190,13 +275,13 @@
         <div class="btn-toolbar" role="toolbar"
              style="background-color: #F7F7F7; height: 50px; position: relative;top: 10px;">
             <div class="btn-group" style="position: relative; top: 18%;">
-                <button type="button" class="btn btn-primary" onclick="window.location.href='save.html';"><span
+                <button type="button" class="btn btn-primary" id="createTranBtn"><span
                         class="glyphicon glyphicon-plus"></span> 创建
                 </button>
-                <button type="button" class="btn btn-default" onclick="window.location.href='edit.html';"><span
+                <button type="button" class="btn btn-default" id="editTranBtn"><span
                         class="glyphicon glyphicon-pencil"></span> 修改
                 </button>
-                <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+                <button type="button" class="btn btn-danger" id="deleteTranBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
             </div>
 
 
@@ -205,7 +290,7 @@
             <table class="table table-hover">
                 <thead>
                 <tr style="color: #B3B3B3;">
-                    <td><input type="checkbox"/></td>
+                    <td><input id="chckAll" type="checkbox"/></td>
                     <td>名称</td>
                     <td>客户名称</td>
                     <td>阶段</td>
@@ -229,3 +314,6 @@
 </div>
 </body>
 </html>
+
+
+

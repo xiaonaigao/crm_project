@@ -1,6 +1,7 @@
 package com.wzl.crm.workbench.mapper;
 
 import com.wzl.crm.workbench.domain.Clue;
+import com.wzl.crm.workbench.domain.FunnelVO;
 
 import java.util.List;
 import java.util.Map;
@@ -102,5 +103,11 @@ public interface ClueMapper {
      * @return 对应id的线索
      */
     Clue selectClueForDetailById(String id);
+
+    /**
+     * 线索图表
+     */
+    List<Integer> selectCountOfClueGroupByClueStage();
+    List<String>selectClueStageOfClueGroupByClueStage();
 
 }

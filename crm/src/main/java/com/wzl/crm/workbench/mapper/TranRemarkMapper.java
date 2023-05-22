@@ -57,4 +57,24 @@ public interface TranRemarkMapper {
      * 批量增加交易备注
      */
     int insertTranRemarkByList(List<TranRemark> tranRemarkList);
+
+    /**
+     * 根据交易id查询交易评论
+     */
+    List<TranRemark> selectTranHistoryForTranid(String tranId);
+
+    /**
+     * 创建交易备注
+     */
+    int insertTranRemark(TranRemark tranRemark);
+
+    /**
+     * 删除交易备注
+     */
+    int deleteTranRemarkById(String id);
+
+    /**
+     * 修改交易备注
+     */
+    int  updateTranRemarkById(TranRemark tranRemark);
 }

@@ -41,6 +41,8 @@ public class ClueServiceImpl implements ClueService {
 	private TranMapper tranMapper;
 	@Autowired
 	private TranRemarkMapper tranRemarkMapper;
+	@Autowired
+	private TranHistoryMapper tranHistoryMapper;
 
 	@Override
 	public int saveCreateClue(Clue clue) {
@@ -215,6 +217,17 @@ public class ClueServiceImpl implements ClueService {
 				}
 				tranRemarkMapper.insertTranRemarkByList(tranRemarkList);
 
+				// 创建交易历史
+				TranHistory tranHistory = new TranHistory();
+				tranHistory.setId(UUIDUtils.getUUID());
+				tranHistory.setStage(tran.getStage());
+				tranHistory.setMoney(tran.getMoney());
+				tranHistory.setExpectedDate(tran.getExpectedDate());
+				tranHistory.setCreateTime(tran.getCreateTime());
+				tranHistory.setCreateBy(tran.getCreateBy());
+				tranHistory.setTranId(tran.getId());
+				tranHistoryMapper.insert(tranHistory);
+
 			}
 		}
 
@@ -228,6 +241,16 @@ public class ClueServiceImpl implements ClueService {
 		// 删除线索
 		clueMapper.deleteClueByIds(clueIds);
 
+	}
+
+	@Override
+	public List<Integer> queryCountOfClueGroupByClueStage() {
+		return clueMapper.selectCountOfClueGroupByClueStage();
+	}
+
+	@Override
+	public List<String> queryClueStageOfClueGroupByClueStage() {
+		return clueMapper.selectClueStageOfClueGroupByClueStage();
 	}
 
 }
